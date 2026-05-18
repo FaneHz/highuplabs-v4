@@ -71,6 +71,12 @@ export default function Navigation({ locale }: { locale: Locale }) {
               {t("apply")}
             </Link>
             <Link
+              href="/dashboard/login"
+              className="ml-4 px-3 py-2 text-[10px] font-mono text-[#A3A3A3] hover:text-[#CCFF00] border border-[#1A1A1A] transition-colors uppercase"
+            >
+              Client
+            </Link>
+            <Link
               href={`/${otherLocale}`}
               className="ml-4 px-3 py-2 text-[10px] font-mono text-[#A3A3A3] hover:text-[#CCFF00] border border-[#1A1A1A] transition-colors uppercase"
             >

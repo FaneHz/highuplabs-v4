@@ -1,49 +1,63 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-const PUBLIC_MARKETING = ["/", "/ro", "/en", "/ro/", "/en/"];
-const PUBLIC_PATHS = [
-  "/login",
-  "/api",
-  "/_next",
-  "/favicon.ico",
-  "/robots.txt",
-  "/sitemap.xml",
-  "/opengraph-image",
-];
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
 
-  // Skip middleware for public paths
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
-    return NextResponse.next();
-  }
-
-  // Allow marketing pages
-  if (
-    !pathname.startsWith("/dashboard") &&
-    !pathname.startsWith("/admin") &&
-    !pathname.startsWith("/login") &&
-    !pathname.startsWith("/onboarding")
-  ) {
-    return NextResponse.next();
-  }
-
-  // Check auth cookie for dashboard/admin routes
-  const authCookie = request.cookies.get("sb-access-token");
-
-  if (!authCookie) {
-    // Redirect to login if accessing dashboard/admin without auth
-    if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) {
-      return NextResponse.redirect(new URL("/login", request.url));
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
     }
-    return NextResponse.next();
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+
+  // Public paths that don't need auth
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/ro") ||
+    pathname.startsWith("/en") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/robots") ||
+    pathname.startsWith("/sitemap") ||
+    pathname.startsWith("/opengraph")
+  ) {
+    return supabaseResponse;
   }
 
-  return NextResponse.next();
+  // Redirect unauthenticated users to login
+  if (!user && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
+    return NextResponse.redirect(new URL("/dashboard/login", request.url));
+  }
+
+  return supabaseResponse;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
