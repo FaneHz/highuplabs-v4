@@ -120,7 +120,7 @@ export const produsProstNuEVinaAgentiei: Article = {
         },
         {
           type: "h2",
-          text: "Ce faci azi, concret",
+          text: "Pașii concreți de astăzi",
         },
         {
           type: "ol",

@@ -55,7 +55,7 @@ export default function ArticleRenderer({ blocks }: { blocks: ArticleBlock[] }) 
                 key={i}
                 className={`my-8 p-6 border-l-2 ${
                   block.tone === "warning" || block.tone === "red"
-                    ? "border-[#EF3E36] bg-[#EF3E36]/5"
+                    ? "border-[#CCFF00] bg-[#CCFF00]/5"
                     : block.tone === "success" || block.tone === "lime"
                     ? "border-[#CCFF00] bg-[#CCFF00]/5"
                     : "border-[#CCFF00] bg-[#111111]"

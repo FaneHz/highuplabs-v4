@@ -8,7 +8,7 @@ export const trotineteElectrice: CaseStudy = {
     ro: {
       title: `60 de zile. 2.161.742 RON. După opt luni în care a plătit să vândă în pierdere.`,
       subtitle:
-        `Magazin de trotinete electrice din Sibiu, preț mediu 3.300 RON. Opt luni cu altă agenție — ROAS 3x în rapoarte, cont bancar pe minus. Două luni mai târziu: 2.161.742 RON venit din 37.062 RON cheltuiți. POAS net 26x.`,
+        `Magazin de trotinete electrice din Sibiu, preț mediu 3.300 RON. Opt luni cu altă agenție — ROAS 3x în rapoarte, cont bancar pe minus. Două luni mai târziu: 2.161.742 RON venit din Google Ads din 21.064 RON cheltuiți. POAS net 26x. Total investiție Google + Meta: 37.062 RON.`,
       industry: `E-commerce · Mobilitate urbană`,
       metaTitle: `Trotinete electrice Sibiu, 2,16M RON în 60 zile, POAS 26x`,
       metaDescription:

@@ -49,11 +49,11 @@ export const cumSaCalculeziMarjaNeta: Article = {
           type: "table",
           headers: ["Produs", "Pret", "Cost", "Curier", "Taxe", "Ambalaj", "Retur", "Marja neta"],
           rows: [
-            ["Trotineta electrica", "2.500", "1.200", "35", "62", "15", "5%", "45.1%"],
-            ["Husa telefon", "89", "25", "18", "4.5", "3", "12%", "33.7%"],
-            ["Crema fata", "120", "35", "18", "5", "4", "8%", "42.5%"],
-            ["Pantaloni barbati", "180", "70", "20", "7", "3", "22%", "28.9%"],
-            ["Supliment fitness", "95", "22", "18", "3.5", "2", "6%", "48.9%"],
+            ["Trotineta electrica", "2.500", "1.200", "35", "62.5", "15", "5%", "42.5%"],
+            ["Husa telefon", "89", "25", "18", "2.2", "3", "12%", "31.3%"],
+            ["Crema fata", "120", "35", "18", "3", "4", "8%", "40.3%"],
+            ["Pantaloni barbati", "180", "70", "20", "4.5", "3", "22%", "22.4%"],
+            ["Supliment fitness", "95", "22", "18", "2.4", "2", "6%", "46.1%"],
           ],
         },
         {

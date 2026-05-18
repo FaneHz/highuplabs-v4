@@ -6,6 +6,7 @@ import { useTranslations } from "@/lib/i18n-context";
 
 export default function Footer({ locale }: { locale: Locale }) {
   const t = useTranslations("footer");
+  const tNav = useTranslations("nav");
 
   const tickerItems = [
     "5-10% COMISION",
@@ -58,10 +59,10 @@ export default function Footer({ locale }: { locale: Locale }) {
             </h4>
             <ul className="space-y-4">
               {[
-                { label: t("articles"), href: "/articole" },
-                { label: t("caseStudies"), href: "/studii-de-caz" },
-                { label: t("about"), href: "/despre" },
-                { label: t("apply"), href: "/aplica" },
+                { label: tNav("articles"), href: "/articole" },
+                { label: tNav("caseStudies"), href: "/studii-de-caz" },
+                { label: tNav("about"), href: "/despre" },
+                { label: tNav("apply"), href: "/aplica" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link

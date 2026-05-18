@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-base: #000000;
+  --color-surface-base: #000000;
   --color-surface: #0A0A0A;
   --color-elevated: #111111;
   --color-lime: #CCFF00;
@@ -12,10 +12,10 @@
   --color-grid: #1A1A1A;
   --color-warning: #FF3333;
 
-  --font-display: "Inter", system-ui, sans-serif;
-  --font-heading: "Space Grotesk", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-mono: "Space Mono", monospace;
+  --font-display: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-space-mono), monospace;
 
   /* Animation tokens */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -25,30 +25,6 @@
   --duration-normal: 300ms;
   --duration-slow: 600ms;
   --duration-reveal: 1000ms;
-}
-
-@font-face {
-  font-family: "Space Grotesk";
-  src: url("https://fonts.gstatic.com/s/spacegrotesk/v16/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXskPMBBSSJLm2E.woff2") format("woff2");
-  font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Space Mono";
-  src: url("https://fonts.gstatic.com/s/spacemono/v12/i7dPIFZifjKcF5UAWdDRYEF8RQ.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
 }
 
 html {

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { Inter, Space_Grotesk, Space_Mono } from "next/font/google";
 import { isValidLocale, type Locale, locales } from "@/lib/i18n";
 import { LocaleProvider } from "@/lib/i18n-context";
 import Navigation from "@/components/layout/Navigation";
@@ -8,6 +9,25 @@ import CookieBanner from "@/components/layout/CookieBanner";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import NoiseOverlay from "@/components/effects/NoiseOverlay";
 import CustomCursor from "@/components/effects/CustomCursor";
+
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-space-mono",
+  display: "swap",
+});
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -56,7 +76,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className="dark">
-      <body className="cursor-none">
+      <body className={`${inter.variable} ${spaceGrotesk.variable} ${spaceMono.variable} cursor-none`}>
         <LocaleProvider locale={locale as Locale}>
           <SmoothScroll>
             <CustomCursor />
