@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
+import { createClient } from "@supabase/supabase-js";
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return null;
   return new Resend(apiKey);
+}
+
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
 }
 
 const applicationSchema = z.object({
@@ -65,6 +73,29 @@ export async function POST(request: NextRequest) {
 
     const data = result.data;
 
+    // 1. Salvează în Supabase (dacă e configurat)
+    try {
+      const supabase = getSupabase();
+      if (supabase) {
+        await supabase.from("applications").insert({
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          website: data.website || null,
+          monthly_sales: data.sales,
+          ad_budget: data.budget,
+          message: data.message || null,
+          ip_address: ip,
+          source: "website",
+          status: "new",
+        });
+      }
+    } catch (dbError) {
+      console.error("Supabase save failed:", dbError);
+      // Nu returnăm eroare — continuăm cu email
+    }
+
+    // 2. Trimite email via Resend
     try {
       const resend = getResend();
       if (resend) {

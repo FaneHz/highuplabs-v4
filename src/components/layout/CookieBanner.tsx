@@ -12,7 +12,8 @@ interface Consent {
 }
 
 const STORAGE_KEY = "hul-consent-v4";
-const GA_ID = "G-XXXXXXXXXX"; // Replace with actual GA4 ID
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX";
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "358583203608980";
 
 function loadConsent(): Consent | null {
   if (typeof window === "undefined") return null;
@@ -42,12 +43,12 @@ function injectPixel(allowed: boolean) {
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window,document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','358583203608980');
+    fbq('init','${META_PIXEL_ID}');
     fbq('track','PageView');
   `;
   document.head.appendChild(script);
   const noscript = document.createElement("noscript");
-  noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=358583203608980&ev=PageView&noscript=1" />';
+  noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1" />';
   document.body.appendChild(noscript);
 }
 
