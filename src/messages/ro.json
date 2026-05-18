@@ -1,0 +1,398 @@
+{
+  "metadata": {
+    "title": "High-Up Labs — Performance Marketing pe Comision",
+    "description": "Primul model comision-only din Romania. 5-10% din vanzarile aduse de reclame. Zero retainer. 90 zile garantie. Pitesti, Romania."
+  },
+  "nav": {
+    "home": "Acasă",
+    "articles": "Articole",
+    "caseStudies": "Studii de caz",
+    "about": "Despre",
+    "apply": "Aplică"
+  },
+  "footer": {
+    "company": "STEFAN SERBAN INVESTITII IMOBILIARE SRL",
+    "cui": "CUI 49663952",
+    "location": "Pitești, Argeș, România",
+    "email": "business@highuplabs.ro",
+    "phone": "+40 725 358 757",
+    "rights": "Toate drepturile rezervate.",
+    "madeIn": "Făcut la Pitești, pentru antreprenori care vor să crească fără să ardă bani.",
+    "explore": "Explorează",
+    "legal": "Legal",
+    "terms": "Termeni și condiții",
+    "privacy": "Politica de confidențialitate",
+    "cookies": "Politica cookie"
+  },
+  "cookieBanner": {
+    "title": "Folosim cookie-uri",
+    "description": "Folosim cookie-uri esențiale pentru funcționarea site-ului și cookie-uri analitice pentru a înțelege cum îl folosești. Poți alege ce accepti.",
+    "essential": "Esențiale (obligatorii)",
+    "analytics": "Analitice",
+    "marketing": "Marketing (Meta Pixel)",
+    "acceptAll": "Accept toate",
+    "acceptSelected": "Accept selecția",
+    "customize": "Personalizează"
+  },
+  "common": {
+    "read": "CITEȘTE",
+    "readMore": "Citește mai mult",
+    "viewAll": "VEZI_TOATE",
+    "apply": "APLICĂ",
+    "applyForAudit": "APLICA_PENTRU_AUDIT",
+    "reserveAudit": "REZERVĂ_AUDITUL",
+    "seeNumbers": "VEZI_CIFRELE",
+    "allArticles": "TOATE_ARTICOLELE",
+    "back": "Înapoi",
+    "next": "Următorul",
+    "loading": "Se încarcă...",
+    "error": "Eroare",
+    "notFound": "Nu am găsit pagina",
+    "contact": "Contact",
+    "email": "business@highuplabs.ro",
+    "phone": "+40 725 358 757"
+  },
+  "homepage": {
+    "hero": {
+      "location": "PITESTI, ROMANIA",
+      "headline1": "SCALEZ",
+      "headline2": "MAGazinul",
+      "headline3": "PE COMISION",
+      "description": "Performance marketing pentru magazine online. Plătești 5-10% din vânzările aduse de reclame. Fără retainer lunar. Fără contract pe termen lung. Conturile rămân pe numele tău.",
+      "proof1": "2.16M RON — trotinete electrice, 60 zile",
+      "proof2": "1.7M RON — agenție turism, 12 luni",
+      "stat1": { "value": "5-10%", "label": "COMISION DIN VANZARI" },
+      "stat2": { "value": "90", "label": "ZILE GARANTIE" },
+      "stat3": { "value": "0", "label": "RETAINER LUNAR" }
+    },
+    "dataStrip": {
+      "ticker": [
+        "5-10% COMISION",
+        "ZERO RETAINER",
+        "90 ZILE GARANȚIE",
+        "META ADS",
+        "GOOGLE ADS",
+        "TIKTOK ADS",
+        "6 CLIENȚI ACTIVI",
+        "3,86M RON GENERAȚI",
+        "102x CEL MAI MARE ROAS",
+        "PITEȘTI, RO",
+        "COMISION-ONLY",
+        "FĂRĂ TERMEN LUNG"
+      ],
+      "stats": {
+        "activeClients": { "value": "6", "label": "CLIENȚI ACTIVI" },
+        "revenue": { "value": "3,86M", "label": "RON GENERAȚI" },
+        "roas": { "value": "102x", "label": "CEL MAI MARE ROAS" },
+        "retainers": { "value": "0", "label": "RETAINERI PLĂTIȚI" }
+      }
+    },
+    "manifesto": {
+      "label": "[01] MANIFESTO",
+      "text": "Șase ani în marketing digital. Am văzut de prea aproape cum funcționează industria. Agenții care încasează mii de euro pe lună și livrează rapoarte frumoase fără vânzări. Antreprenori care au ars zeci de mii de euro și-au rămas cu buzunarele goale. Conturi de reclame ținute ostatice pe numele agenției, ca să nu poți pleca. Toamna lui 2025 am deschis High-Up Labs. Fără retainer. Fără bullshit. 5-10% comision din vânzările generate de reclame. Conturile sunt pe numele tău, tu ești admin, tu deții datele. 90 de zile să atingem targetul de profit. Dacă ratăm, luna a patra e pe noi. Scris negru pe alb în contract. Nu e promisiune de marketing. E matematică simplă.",
+      "pillars": [
+        { "num": "01", "title": "Transparență totală", "desc": "Conturile tale. Pixelul tău. Datele tale. Noi avem acces doar cât lucrăm împreună." },
+        { "num": "02", "title": "Aliniere reală", "desc": "Câștigăm doar când câștigi tu. Nu vinzi? Nu facturăm. Zero risc, zero scuze." },
+        { "num": "03", "title": "Asumare", "desc": "Ratăm targetul în 90 de zile? Luna a patra e pe noi. Scris negru pe alb în contract." }
+      ]
+    },
+    "comparison": {
+      "label": "[02] COMPARATIE",
+      "title": "NOI VS EI",
+      "headerAspect": "Aspect",
+      "headerUs": "HIGH-UP.LABS",
+      "headerThem": "Agentia \"Standard\"",
+      "rows": [
+        { "aspect": "Plata", "us": "5-10% din vânzările generate de reclame. Zero retainer. Plătești doar când vindem.", "them": "Retainer fix 1.500–5.000 EUR pe lună. Plătești și când vânzările sunt zero. Și când campaniile dau pe minus." },
+        { "aspect": "Conturile tale", "us": "Business Manager, conturi de reclame, pixel — toate pe numele tău. Tu ești proprietarul datelor. Pleci când vrei, cu tot istoricul.", "them": "Conturile pe numele agenției. Pierzi pixelul, audiențele și istoricul la plecare. Reconstrucția costă mii de euro și luni de zile." },
+        { "aspect": "Raportare", "us": "Săptămânal. POAS, ROAS, AOV, CPA, cost per achiziție. Numere care contează, nu reach și impresii.", "them": "Reach, impresii, engagement, \"brand awareness\". Raport lunar în Canva cu culori frumoase și zero substanță." },
+        { "aspect": "Contract", "us": "Fără termen minim. 30 de zile preaviz. Nicio penalizare la plecare.", "them": "6–12 luni blocați. Penalizări la ieșire. Te-au prins cu ghiarele și nu te lasă să respiri." },
+        { "aspect": "Garanție", "us": "90 de zile. Dacă nu atingem targetul agreat, luna a 4-a e gratis. Scris negru pe alb în contract.", "them": "Nicio garanție. \"Mai optimizăm\", \"algoritmul învață\", \"trebuie să aștepți\". Traducere: habar n-au ce fac." },
+        { "aspect": "Creative", "us": "Scripturi video, brief-uri, poze, carusele, bannere. Noi le facem. Tu filmezi cu telefonul.", "them": "\"Nu avem buget de creative.\" Sau îți dau stock photos de pe Shutterstock. Sau spun că \"conținutul organic e responsabilitatea ta.\"" },
+        { "aspect": "Selecție client", "us": "Analizăm magazinul, produsul și marja înainte. Dacă nu ești pregătit, spunem nu pe față.", "them": "Semnează oricine cu un card valid. Apoi dau vina pe client, pe piață, pe sezon, pe orice." }
+      ]
+    },
+    "valueStack": {
+      "label": "[03] OFERTA",
+      "title": "CE PRIMEȘTI",
+      "includesLabel": "[INCLUS]",
+      "excludesLabel": "[NU_INCLUDE]",
+      "includes": [
+        "Creative-uri complete: poze, carusele, bannere și formaturi adaptate pentru Meta Ads, Google Ads și TikTok Ads",
+        "Setup și management de campanii de la zero, pe toate platformele relevante pentru e-commerce",
+        "Tracking corect: audit, instalare și testare pixel Meta, GA4, TikTok, Google Ads — verificăm că fiecare conversie se înregistrează",
+        "Script-uri video și brief-uri creative: noi scriem scenariul și dăm direcția, tu filmezi cu telefonul",
+        "Raportare săptămânală cu POAS, ROAS, AOV, CPA. Metrici reali care arată profitul, nu numere de paradă.",
+        "Acces total la date. Conturile tale, tu ești admin. Zero opacitate, zero scuze."
+      ],
+      "excludes": [
+        "Filmare video cu echipament profesional: nu venim cu cameramani, lumini sau studio. Filmarea e treaba ta, cu telefonul.",
+        "Social media organic: postări, stories, răspuns la comentarii, community management. Nu facem asta și nici nu pretindem că facem.",
+        "Refacerea produsului sau ofertei: îți spunem direct dacă produsul sau oferta e problematică, dar nu reparăm noi ce nu ține de reclame."
+      ],
+      "pricing": {
+        "commission": { "label": "Comision", "value": "5-10%", "note": "din vanzarile aduse de reclame" },
+        "minBudget": { "label": "Minim buget", "value": "€2K+", "note": "buget ads pe luna" },
+        "minMargin": { "label": "Marja minima", "value": "15%", "note": "marja neta pentru a functiona" }
+      }
+    },
+    "calculator": {
+      "label": "[04] CALCULATOR",
+      "title": "CÂT RĂMÂNE ÎN CONT DUPĂ ADS ȘI COMISION",
+      "description": "POAS = Profit Over Ad Spend. Spre deosebire de ROAS, care doar împarte venitul la bugetul de reclame, POAS îți arată cât profit real rămâne după ce plătești ads-urile și comisionul nostru. ROAS de 4x cu marjă de 10% poate însemna pierdere. POAS de 1.5x cu marjă de 40% înseamnă bani concreți în cont.",
+      "sliders": {
+        "sales": "Vânzări/lună (EUR)",
+        "budget": "Buget ads/lună (EUR)",
+        "margin": "Marjă netă (%)",
+        "commission": "Comision HUL (%)"
+      },
+      "results": {
+        "label": "[REZULTAT]",
+        "grossProfit": "Profit brut după marjă",
+        "commission": "Comision High-Up Labs",
+        "adBudget": "Buget ads",
+        "netProfit": "Profit net estimat",
+        "poas": "POAS estimat (profit/ad spend)"
+      },
+      "disclaimer": "Calculul e simplificat. Nu include costuri fixe, salarii, impozit pe profit sau retururi. Scopul e să-ți arate ordinul de mărime. POAS contează mai mult decât ROAS pentru că măsoară profitul real rămas în cont, nu doar venitul generat."
+    },
+    "cases": {
+      "label": "[05] STUDII DE CAZ",
+      "title": "CIFRE REALE",
+      "viewAll": "[VEZI_TOATE]",
+      "cases": [
+        {
+          "slug": "trotinete-electrice",
+          "industry": "ECOMMERCE // RO",
+          "title": "Trotinete electrice Sibiu: 37.062 RON investiți, 2.161.742 RON vânzări în 60 de zile.",
+          "stats": [
+            { "label": "REVENUE", "value": "2.16M RON" },
+            { "label": "ROAS", "value": "102x" },
+            { "label": "POAS", "value": "26x" }
+          ],
+          "excerpt": "Google Ads PMax + Meta Ads. 1.043 conversii. Clientul lucrase 8 luni cu altă agenție — raportau ROAS 3x, dar pe card ieșea pe minus. Am luat același buget și am scos 2.16 milioane."
+        },
+        {
+          "slug": "agentie-turism-arges",
+          "industry": "TURISM // RO",
+          "title": "Agenție turism Argeș: 1.700.657 lei în 12 luni, pornind de la zero digital.",
+          "stats": [
+            { "label": "REVENUE", "value": "1.7M lei" },
+            { "label": "FACTURI", "value": "993" },
+            { "label": "POAS", "value": "3.2x" }
+          ],
+          "excerpt": "SmartBill + Meta CAPI + landing pages. De la zero online la 993 facturi în primul an. 85% dintre clienți se întorc. Venit mediu zilnic în Q1 2026: 4.436 lei."
+        }
+      ]
+    },
+    "articles": {
+      "label": "[06] ARTICOLE",
+      "title": "CITEȘTE ÎNAINTE",
+      "viewAll": "[TOATE_ARTICOLELE]",
+      "read": "[CITESTE]",
+      "articles": [
+        {
+          "slug": "11-red-flags-agentii",
+          "num": "01",
+          "tag": "PROTECȚIE",
+          "title": "11 semne că agenția cu care stai să semnezi o să te lase lat",
+          "readTime": "12 min"
+        },
+        {
+          "slug": "retainer-vs-comision",
+          "num": "02",
+          "tag": "PROTECȚIE",
+          "title": "De ce retainerul de 1.500 de euro îți mănâncă businessul mai rău decât crezi",
+          "readTime": "10 min"
+        },
+        {
+          "slug": "produs-prost-nu-e-vina-agentiei",
+          "num": "03",
+          "tag": "PROTECȚIE",
+          "title": "Dacă produsul e prost, nicio agenție din lume nu te salvează",
+          "readTime": "8 min"
+        }
+      ]
+    },
+    "qualify": {
+      "label": "[07] VERIFICARE",
+      "title": "ESTI PREGATIT?",
+      "scoreLabel": "[SCOR_TAU]",
+      "questions": [
+        "Ai minim 2.000 EUR/lună buget de reclame?",
+        "Marja netă pe produs e peste 15%?",
+        "Ai tracking funcțional (Pixel, GA4) sau ești dispus să-l montezi?",
+        "Poți procesa de 3x mai multe comenzi fără să cedezi operațional?",
+        "Ai vânzări validate (nu testăm produse care n-au vândut)?"
+      ],
+      "results": {
+        "perfect": { "title": "DA.", "desc": "Businessul tău e gata de scaling." },
+        "good": { "title": "APROAPE.", "desc": "Mai ai câteva puncte de fixat." },
+        "bad": { "title": "NU ÎNCĂ.", "desc": "Businessul mai are de maturizat." }
+      }
+    },
+    "ctaFinal": {
+      "ticker": "PLATESTI CAND VINZI. SCALAM PROFITUL, NU RETAINERUL.",
+      "title1": "AUDIT GRATUIT PE",
+      "title2": "CIFRELE TALE",
+      "description": "30 de minute pe cifrele tale, fără obligație. Îți arătăm ce merge, ce nu, și dacă are sens să lucrăm împreună. Dacă nu, îți spunem direct. Fără follow-up agresiv. Fără \"când semnăm\".",
+      "button": "[REZERVĂ_AUDITUL]",
+      "footer": "Fără presiune. Fără vânzare forțată. Dacă e nu, rămâne nu."
+    }
+  },
+  "about": {
+    "label": "[ORIGIN]",
+    "title": "DESPRE NOI",
+    "story": {
+      "p1": "Suntem în Pitești. Șase ani în marketing. Am văzut cum agențiile încasează mii de euro lunar. Indiferent dacă clientul vinde sau nu. Am văzut rapoarte în Canva. Reach organic. Impresii. Am văzut fondatori care au ars zeci de mii de euro. Și au rămas cu zero. Toamna 2025 am deschis High-Up Labs. Model diferit.",
+      "p2": "Tu plătești doar când vinzi. 5-10% comision din vânzările aduse de reclame. Zero retainer. Zero costuri ascunse. Conturile Meta, Google și TikTok rămân pe numele tău. Tu ești admin. Noi avem acces doar cât lucrăm. Dacă în 90 de zile nu atingem targetul de POAS stabilit împreună, luna a patra e gratis. Nu e marketing fluff. E matematică simplă.",
+      "p3": "Șase clienți activi în prezent. Printre ei: un magazin de trotinete electrice din Sibiu — 2.160.000 RON în 60 de zile. O agenție de turism din Argeș — 1.700.000 lei în 12 luni, pornind de la zero digital."
+    },
+    "model": {
+      "label": "[MODEL]",
+      "items": [
+        {
+          "num": "01",
+          "title": "De ce comision-only?",
+          "desc": "Am verificat 22 de agenții din România. Toate pe retainer. Niciuna nu oferă performance marketing pur pe comision din vânzări. Agențiile mari nu pot adopta acest model. Au costuri fixe masive. Chirie în București. 30+ angajați. Noi, din Pitești, cu costuri reduse, facem ce ei nu pot. Sacrificăm predictibilitatea veniturilor pentru diferențiere absolută."
+        },
+        {
+          "num": "02",
+          "title": "De ce 90 de zile garanție?",
+          "desc": "Pentru că antreprenorul român e traumatizat de instabilitate. Nu e zgârcit. E ars. 40,7% dintre microîntreprinderi sunt pe pierdere. 83.012 firme s-au radiat în 2024. Fiecare leu cheltuit ar fi putut merge către salarii, stoc sau supraviețuire. Modelul retainer e profund injust. Plătești aceeași sumă indiferent dacă faci cifră-record sau ești pe minus. Noi riscăm împreună cu tine."
+        },
+        {
+          "num": "03",
+          "title": "De ce conturile tale?",
+          "desc": "Am văzut prea des scenariul ăsta. Agenția îți ține conturile ostatic. Vrei să pleci? Îți dau accesul greu. Sau deloc. Datele sunt ale tale. Pixelul e al tău. Audiențele sunt ale tale. Când terminăm colaborarea, tu rămâi cu tot ce am construit împreună. Nu cu un folder de rapoarte în Canva."
+        }
+      ]
+    },
+    "values": {
+      "label": "[VALUES]",
+      "items": [
+        { "num": "01", "title": "Onestitate", "desc": "Îți spunem când e vina businessului. Reclamele nu repară un produs slab, un preț nepotrivit sau un site care nu convertește. Dacă nu ești pregătit, îți spunem în primul call." },
+        { "num": "02", "title": "Transparență", "desc": "Conturile rămân ale tale. Meta, Google, TikTok, GA4 — toate pe numele tău, tu admin. Acces doar cât lucrăm. Raportăm POAS, ROAS, AOV, CPA. Zero metrici inventate." },
+        { "num": "03", "title": "Aliniere", "desc": "Câștigăm doar dacă câștigi tu. 5-10% comision din ce vindem prin reclame. Zero retainer. Zero costuri ascunse. Nu vinzi? Nu facturăm. E simplu." },
+        { "num": "04", "title": "Asumare", "desc": "Luna a 4-a e pe noi dacă ratăm. Stabilim un target concret de POAS în primul call. Nu-l atingem în 90 de zile? Nu ne plătești nimic. Scris în contract. Nu promis la telefon." }
+      ]
+    },
+    "company": {
+      "label": "[ENTITY_DATA]",
+      "nameLabel": "Denumire",
+      "name": "STEFAN SERBAN INVESTITII IMOBILIARE SRL",
+      "cuiLabel": "CUI",
+      "cui": "49663952",
+      "hqLabel": "Sediu",
+      "hq": "Pitești, Argeș, România",
+      "contactLabel": "Contact",
+      "contact": "business@highuplabs.ro / +40 725 358 757"
+    }
+  },
+  "terms": {
+    "label": "[LEGAL]",
+    "title": "TERMENI ȘI CONDIȚII",
+    "updated": "Ultima actualizare: 17 mai 2026",
+    "sections": [
+      { "num": "01", "title": "Despre noi", "content": "High-Up Labs este o agenție de performance marketing operată de STEFAN SERBAN INVESTITII IMOBILIARE SRL, CUI 49663952, cu sediul în Pitești, Argeș. Detaliile complete de identificare legală apar în acest document și în contractul semnat între părți. Agenția a fost deschisă în toamna 2025." },
+      { "num": "02", "title": "Obiectul serviciilor", "content": "Serviciile noastre includ management de campanii plătite (Meta Ads, Google Ads, TikTok Ads), audit de tracking, generare de creative (imagini și scripturi video) și raportare periodică (POAS, ROAS, AOV, CPA). Nu includem filmarea clipurilor, management social media organic sau refacerea produsului. Detaliile specifice se definesc în fiecare contract individual." },
+      { "num": "03", "title": "Comisionul", "content": "Modelul nostru este comision-only: 5-10% din vânzările generate direct de reclame. Procentul exact, perioada de calcul și modalitatea de facturare se stabilesc contractual. Nu percepem retainer, setup fee sau alte costuri ascunse. Minimum: 2.000 EUR buget ads pe lună sau 15% marjă netă confirmată." },
+      { "num": "04", "title": "Garanția de 90 zile", "content": "Dacă în primele 90 de zile de colaborare nu atingem targetul POAS agreat inițial, luna a 4-a este gratis. Această clauză se aplică doar dacă businessul, produsul, stocul și tracking-ul clientului sunt funcționale și acceptate de noi la începutul colaborării." },
+      { "num": "05", "title": "Conturile clientului", "content": "Toate conturile de reclame, pixelii de tracking și datele asociate se deschid pe numele și în proprietatea clientului. Clientul este administratorul principal. High-Up Labs are drept de acces doar pe durata colaborării și doar la conturile delegate contractual. La încetare, accesul nostru se revocă imediat." },
+      { "num": "06", "title": "Rezilierea", "content": "Orice parte poate rezilia colaborarea cu notificare scrisă de 30 de zile. Clientul poate rezilia și fără preaviz dacă descoperă nerespectarea clauzelor contractuale. La reziliere, toate conturile și datele rămân la client. Comisionul se calculează pro-rata până la data încetării." },
+      { "num": "07", "title": "Proprietatea intelectuală", "content": "Creative-urile generate (imagini, scripturi video, texte de reclamă) rămân proprietatea clientului după plata comisionului aferent. Materialele de strategie și documentele interne rămân proprietatea High-Up Labs." },
+      { "num": "08", "title": "Limitarea răspunderii", "content": "High-Up Labs nu garantează volume specifice de vânzări. Rezultatele depind de calitatea produsului, ofertei, prețului și stocului clientului. Răspunderea financiară totală a High-Up Labs este limitată la valoarea comisionului încasat în ultimele 3 luni de la apariția problemei." },
+      { "num": "09", "title": "Modificări", "content": "Acești termeni pot fi actualizați periodic. Modificările semnificative vor fi notificate clienților activi prin email cu minimum 15 zile înainte de intrarea în vigoare." },
+      { "num": "10", "title": "Legea aplicabilă", "content": "Contractele și litigiile se guvernează de legea română. Jurisdicția competentă este Judecătoria Pitești." }
+    ],
+    "contactLabel": "Contact",
+    "contactCompany": "STEFAN SERBAN INVESTITII IMOBILIARE SRL",
+    "contactCui": "CUI 49663952",
+    "contactAddress": "Pitești, Argeș, România",
+    "contactDetails": "business@highuplabs.ro / +40 725 358 757"
+  },
+  "privacy": {
+    "label": "[LEGAL]",
+    "title": "CONFIDENȚIALITATE",
+    "updated": "Ultima actualizare: 17 mai 2026",
+    "sections": [
+      { "num": "01", "title": "Operator de date", "content": "High-Up Labs (STEFAN SERBAN INVESTITII IMOBILIARE SRL, CUI 49663952, Pitești, Argeș) este operatorul datelor cu caracter personal colectate prin acest site și prin formularele de contact, în conformitate cu Regulamentul (UE) 2016/679 (GDPR)." },
+      { "num": "02", "title": "Ce date colectăm", "content": "Prin formularul de aplicare colectăm: nume, adresă de email, număr de telefon, site web și date despre business (vânzări lunare, buget ads, marjă netă, platformă de tracking). Prin navigare colectăm automat: adresă IP, tip de browser, pagini vizitate, durata vizitei și interacțiuni (prin cookie-uri, pixeli și analytics)." },
+      { "num": "03", "title": "De ce le colectăm", "content": "Pentru a-ți răspunde la aplicare, a evalua compatibilitatea, a personaliza oferta, a optimiza campaniile publicitare, a măsura performanța site-ului și a comunica periodic. Nu folosim datele în alte scopuri decât cele declarate." },
+      { "num": "04", "title": "Temeiul legal", "content": "Prelucrarea se bazează pe: (a) executarea unui contract sau demersuri precontractuale (art. 6(1)(b) GDPR), (b) consimțământul explicit pentru marketing (art. 6(1)(a) GDPR), și (c) interese legitime pentru securitate și optimizare (art. 6(1)(f) GDPR)." },
+      { "num": "05", "title": "Cu cine împărtășim datele", "content": "Cu procesatori contractuali: Vercel (hosting), Resend (email), Google Analytics (analytics), Meta Platforms (publicitate). Toți sunt localizați în SUA sau UE și oferă garanții GDPR (clauze contractuale standard). Nu vindem și nu dăm datele tale altor terți pentru marketing direct." },
+      { "num": "06", "title": "Drepturile tale", "content": "Ai dreptul de acces, rectificare, ștergere (dreptul de a fi uitat), portabilitate, opoziție și restricționare a prelucrării. Pentru exercitarea drepturilor, trimite o cerere la business@highuplabs.ro. Răspundem în maximum 30 de zile calendaristice. Ai dreptul de a depune o plângere la ANSPDCP." },
+      { "num": "07", "title": "Rețenția datelor", "content": "Aplicațiile nerăspunse se păstrează 24 de luni, apoi sunt șterse automat. Dacă semnăm contract, datele se păstrează conform legislației fiscale române (10 ani pentru documente contabile). Datele de navigare se păstrează 26 de luni în Google Analytics." },
+      { "num": "08", "title": "Securitate", "content": "Datele sunt stocate pe servere criptate (TLS 1.3). Transferul se face exclusiv prin HTTPS. Accesul intern este limitat strict la persoane autorizate. Nu stocăm parole sau date de card." },
+      { "num": "09", "title": "Cookie-uri", "content": "Folosim cookie-uri esențiale (funcționare site, preferințe de limbă), cookie-uri analitice (Google Analytics 4) și cookie-uri de marketing (Meta Pixel pentru remarketing și conversii). Detalii complete în pagina Cookie." },
+      { "num": "10", "title": "Contact DPO", "content": "Pentru orice întrebare privind datele personale, contactează-ne la business@highuplabs.ro sau la adresa din Pitești, Argeș." }
+    ],
+    "dpoLabel": "DPO",
+    "dpoEmail": "business@highuplabs.ro",
+    "dpoAddress": "Pitești, Argeș, România"
+  },
+  "cookies": {
+    "label": "[LEGAL]",
+    "title": "COOKIES",
+    "updated": "Ultima actualizare: 17 mai 2026",
+    "whatAre": {
+      "title": "Ce sunt cookie-urile",
+      "content": "Cookie-urile sunt fișiere text mici stocate pe dispozitivul tău când vizitezi un site. Ele ne ajută să oferim o experiență funcțională, să analizăm traficul și să măsurăm performanța campaniilor publicitare. Poți refuza cookie-urile non-esențiale prin banner sau setările browserului."
+    },
+    "categories": {
+      "title": "Categorii de cookie-uri",
+      "essential": {
+        "label": "[ESSENTIAL]",
+        "badge": "REQUIRED",
+        "content": "Necesare pentru funcționarea de bază a site-ului. Nu pot fi dezactivate. Include: preferință de limbă (ro/en), sesiune de navigare, securitate (CSRF, HTTPS). Fără ele, site-ul nu funcționează corect."
+      },
+      "analytics": {
+        "label": "[ANALYTICS]",
+        "content": "Ne ajută să înțelegem cum folosești site-ul și să îl îmbunătățim. Include: Google Analytics 4 (măsurare trafic, durată vizită, pagini vizitate, evenimente). Datele sunt anonimizate. Fără ele, nu știm ce pagini merg și care nu."
+      },
+      "marketing": {
+        "label": "[MARKETING]",
+        "content": "Folosite pentru remarketing și măsurarea conversiilor din reclame. Include: Meta Pixel (Facebook/Instagram) — urmărire conversii, audiențe personalizate, optimizare livrare reclame. Aceste cookie-uri necesită consimțământ explicit conform GDPR."
+      }
+    },
+    "manage": {
+      "title": "Cum gestionezi cookie-urile",
+      "content": "Poți gestiona preferințele oricând prin banner-ul de cookie-uri din partea de jos a site-ului. De asemenea, poți dezactiva cookie-urile direct din browser: Chrome (Setări > Confidențialitate), Safari (Preferințe > Confidențialitate), Firefox (Setări > Confidențialitate). Reține: dezactivarea cookie-urilor analitice și de marketing nu afectează funcționarea site-ului, dar ne împiedică să măsurăm performanța."
+    }
+  },
+  "articles": {
+    "label": "[ARCHIVE]",
+    "title": "ARTICOLE",
+    "subtitle": "Cel mai bun mod sa nu te tepuiasca o agentie e sa stii ce faci. Fara jargon. Fara corporate speak.",
+    "readLabel": "[READ]",
+    "relatedLabel": "[ALTE_ARTICOLE]",
+    "ctaLabel": "[CTA]",
+    "ctaText": "Vrei audit gratuit pe businessul tau? 30 de minute, fara obligatie.",
+    "ctaButton": "[APLICA]",
+    "tags": {
+      "protection": "PROTECȚIE",
+      "strategy": "STRATEGIE",
+      "metrics": "METRICI",
+      "scaling": "SCALING"
+    }
+  },
+  "cases": {
+    "label": "[PROOF]",
+    "title": "STUDII DE CAZ",
+    "subtitle": "Cifre reale. Inclusiv ce am facut bine si ce am ratat. Fara grafice photoshopate.",
+    "ndaBadge": "[NDA]",
+    "relatedLabel": "[ALTE_STUDII]",
+    "stepLabel": "PASUL",
+    "indicator": "Indicator",
+    "before": "Inainte",
+    "after": "Dupa",
+    "sections": {
+      "discovery": "Discovery",
+      "strategy": "Strategy",
+      "execution": "Execution",
+      "results": "Results",
+      "mistakes": "Mistakes",
+      "learnings": "Learnings"
+    }
+  }
+}
