@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const OfferCalculator = dynamic(
-  () => import("@/components/sections/OfferCalculator"),
-  { ssr: false, loading: () => <div>Loading...</div> }
-);
+import OfferCalculatorWrapper from "./OfferCalculatorWrapper";
 
 export async function generateMetadata({
   params,
@@ -34,7 +29,7 @@ export async function generateStaticParams() {
 export default function OfertaPage() {
   return (
     <main className="bg-[#0A0A0A] min-h-screen">
-      <OfferCalculator />
+      <OfferCalculatorWrapper />
     </main>
   );
 }
