@@ -22,7 +22,8 @@ async function fetchConfigFromSupabase(key: string): Promise<string | null> {
     }
 
     return data.value;
-  } catch {
+  } catch (err) {
+    console.warn("[config] fetchConfigFromSupabase failed:", err instanceof Error ? err.message : String(err));
     return null;
   }
 }
@@ -71,7 +72,8 @@ export async function getAllPublicConfigs(): Promise<Record<string, string>> {
       acc[row.key] = row.value;
       return acc;
     }, {} as Record<string, string>);
-  } catch {
+  } catch (err) {
+    console.warn("[config] getAllPublicConfigs failed:", err instanceof Error ? err.message : String(err));
     return {};
   }
 }

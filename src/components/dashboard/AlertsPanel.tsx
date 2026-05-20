@@ -51,8 +51,8 @@ export function AlertsPanel({ alerts, triggeredAlerts, onUpdate }: AlertsPanelPr
       setShowForm(false);
       setFormData({ metric: "ROAS", operator: "<", threshold: "", is_active: true });
       onUpdate();
-    } catch (err: any) {
-      showToast(err.message || "Eroare la creare alertă", "error");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Eroare la creare alertă", "error");
     }
   }
 
@@ -61,8 +61,8 @@ export function AlertsPanel({ alerts, triggeredAlerts, onUpdate }: AlertsPanelPr
       await deleteAlertRule(id);
       showToast("Alerta ștearsă", "success");
       onUpdate();
-    } catch (err: any) {
-      showToast(err.message || "Eroare la ștergere", "error");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Eroare la ștergere", "error");
     }
   }
 
@@ -71,8 +71,8 @@ export function AlertsPanel({ alerts, triggeredAlerts, onUpdate }: AlertsPanelPr
       await updateAlertRule(id, { is_active: !isActive });
       showToast(`Alerta ${!isActive ? "activată" : "dezactivată"}`, "success");
       onUpdate();
-    } catch (err: any) {
-      showToast(err.message || "Eroare la actualizare", "error");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Eroare la actualizare", "error");
     }
   }
 
@@ -81,8 +81,8 @@ export function AlertsPanel({ alerts, triggeredAlerts, onUpdate }: AlertsPanelPr
       await acknowledgeAlert(id);
       showToast("Alerta marcată ca citită", "success");
       onUpdate();
-    } catch (err: any) {
-      showToast(err.message || "Eroare", "error");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Eroare", "error");
     }
   }
 

@@ -383,8 +383,8 @@ export default function OfferCalculator() {
       } catch (emailErr) {
         console.error("Email notification failed:", emailErr);
       }
-    } catch (err: any) {
-      setError(err.message || "A apărut o eroare. Te rugăm să încerci din nou.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "A apărut o eroare. Te rugăm să încerci din nou.");
       console.error("handleAcceptOffer error:", err);
     } finally {
       setLoading(false);
@@ -453,8 +453,8 @@ export default function OfferCalculator() {
       } catch (emailErr) {
         console.error("Email notification failed:", emailErr);
       }
-    } catch (err: any) {
-      setError(err.message || "A apărut o eroare. Te rugăm să încerci din nou.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "A apărut o eroare. Te rugăm să încerci din nou.");
       console.error("handleRejectOffer error:", err);
     } finally {
       setLoading(false);
@@ -537,8 +537,8 @@ export default function OfferCalculator() {
       } catch (emailErr) {
         console.error("Email notification failed:", emailErr);
       }
-    } catch (err: any) {
-      setError(err.message || "A apărut o eroare. Te rugăm să încerci din nou.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "A apărut o eroare. Te rugăm să încerci din nou.");
       console.error("handleContractSubmit error:", err);
     } finally {
       setLoading(false);

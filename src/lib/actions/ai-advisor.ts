@@ -120,12 +120,12 @@ async function buildContext(userId: string): Promise<AdvisorContext> {
             campaigns: insights.campaigns?.length || 0,
           };
         }
-      } catch {
-        // Meta data not available, continue without it
+      } catch (err) {
+        console.warn("[ai-advisor] Meta data not available:", err instanceof Error ? err.message : String(err));
       }
     }
-  } catch {
-    // Context building failed, continue with empty context
+  } catch (err) {
+    console.warn("[ai-advisor] Context building failed:", err instanceof Error ? err.message : String(err));
   }
 
   return context;

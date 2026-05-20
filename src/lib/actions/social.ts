@@ -87,7 +87,8 @@ function extractJsonFromCompletion(result: unknown): unknown {
 
   try {
     return JSON.parse(content);
-  } catch {
+  } catch (err) {
+    console.warn("[social] JSON parse error, retrying with cleaned content:", err instanceof Error ? err.message : String(err));
     const cleaned = content.replace(/^```json\s*/, '').replace(/\s*```$/, '');
     return JSON.parse(cleaned);
   }

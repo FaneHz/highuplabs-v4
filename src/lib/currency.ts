@@ -61,7 +61,8 @@ export async function getExchangeRate(
     });
 
     return rate;
-  } catch {
+  } catch (err) {
+    console.warn("[currency] getExchangeRate failed, using fallback:", err instanceof Error ? err.message : String(err));
     // Fallback to hardcoded approximate rates
     if (from === "RON" && to === "EUR") return FALLBACK_RON_TO_EUR;
     if (from === "EUR" && to === "RON") return FALLBACK_EUR_TO_RON;

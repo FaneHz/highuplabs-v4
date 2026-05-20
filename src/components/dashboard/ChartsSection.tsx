@@ -20,21 +20,33 @@ import type { DailyMetrics } from "@/types";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 
+interface TooltipPayloadEntry {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
+}
+
 const TIME_RANGES = [
   { label: "7z", value: 7 },
   { label: "30z", value: 30 },
   { label: "90z", value: 90 },
 ];
 
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || !payload.length) return null;
 
   return (
     <div className="bg-white border-2 border-[var(--color-ink)] p-3 shadow-[4px_4px_0px_0px_var(--color-ink)] font-mono text-xs">
       <p className="font-bold mb-2 text-[var(--color-ink)]">
-        {format(parseISO(label), "dd MMM yyyy", { locale: ro })}
+        {format(parseISO(label ?? ""), "dd MMM yyyy", { locale: ro })}
       </p>
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry: TooltipPayloadEntry, index: number) => (
         <div key={index} className="flex items-center gap-2 mb-1">
           <div
             className="w-2 h-2 border border-[var(--color-ink)]"

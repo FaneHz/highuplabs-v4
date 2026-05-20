@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         }
         dbSaved = true;
       }
-    } catch (dbError: any) {
+    } catch (dbError) {
       console.error("Supabase save failed:", dbError);
       return NextResponse.json(
         { error: "Eroare la salvarea datelor. Încearcă mai târziu." },
@@ -143,12 +143,6 @@ export async function POST(request: NextRequest) {
       console.error("Email sending failed:", emailError);
       // Nu returnăm 500 - aplicația a fost salvată în DB
     }
-
-    console.log("Application received:", {
-      ...data,
-      ip,
-      timestamp: new Date().toISOString(),
-    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

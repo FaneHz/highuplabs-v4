@@ -80,7 +80,7 @@ export interface Report {
   type: string;
   period_start?: string;
   period_end?: string;
-  content?: any;
+  content?: Record<string, unknown>;
   status: string;
   created_at?: string;
 }

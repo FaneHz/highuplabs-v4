@@ -6,7 +6,7 @@ export function createClient() {
 
   if (!url || !key) {
     console.warn("Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
-    return createErrorProxy("Supabase not configured") as any;
+    return createErrorProxy("Supabase not configured");
   }
 
   return createBrowserClient(url, key);
@@ -22,7 +22,7 @@ function getCachedClient() {
   return _supabaseClient;
 }
 
-function createErrorProxy(message: string): any {
+function createErrorProxy(message: string): ReturnType<typeof createBrowserClient> {
   const dataProxy = new Proxy({}, {
     get() { return null; }
   });
@@ -36,7 +36,7 @@ function createErrorProxy(message: string): any {
     apply() {
       return createErrorProxy(message);
     },
-  });
+  }) as unknown as ReturnType<typeof createBrowserClient>;
 }
 
 export const supabaseClient = new Proxy({} as ReturnType<typeof createBrowserClient>, {

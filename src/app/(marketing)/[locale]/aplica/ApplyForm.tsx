@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, UseFormRegister } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocale } from "@/lib/i18n-context";
@@ -65,10 +65,10 @@ export default function ApplyPage() {
   const values = watch();
 
   const nextStep = async () => {
-    const fields = step === 0 
+    const fields: (keyof FormData)[] = step === 0 
       ? ["name", "email", "phone", "website"] 
       : ["sales", "budget"];
-    const valid = await trigger(fields as any);
+    const valid = await trigger(fields);
     if (valid) setStep((s) => s + 1);
   };
 
@@ -88,8 +88,8 @@ export default function ApplyPage() {
         throw new Error(result.error || "Eroare la trimitere");
       }
       setSubmitted(true);
-    } catch (err: any) {
-      setSubmitError(err.message || "Eroare la trimitere. Încearcă din nou.");
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Eroare la trimitere. Încearcă din nou.");
     } finally {
       setSubmitting(false);
     }
@@ -344,9 +344,9 @@ function Field({
   placeholder,
 }: {
   label: string;
-  name: string;
+  name: keyof FormData;
   type?: string;
-  register: any;
+  register: UseFormRegister<FormData>;
   error?: string;
   placeholder?: string;
 }) {

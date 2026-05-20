@@ -86,5 +86,6 @@ export async function fetchMetaAdAccounts(accessToken: string): Promise<Array<{ 
     throw new Error(`Failed to fetch ad accounts: ${res.status} ${err}`);
   }
   const data = await res.json();
-  return (data.data || []).filter((acc: any) => acc.account_status === 1);
+  const accounts: Array<{ id: string; name: string; account_status: number }> = data.data || [];
+  return accounts.filter((acc) => acc.account_status === 1);
 }

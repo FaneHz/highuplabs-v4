@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { SettingsPage } from "@/components/dashboard/SettingsPage";
+import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
 import { redirect } from "next/navigation";
 
 export default async function SettingsRoute() {
@@ -19,7 +20,9 @@ export default async function SettingsRoute() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold font-mono mb-8">Setări</h1>
-      <SettingsPage client={client} />
+      <ErrorBoundary>
+        <SettingsPage client={client} />
+      </ErrorBoundary>
     </div>
   );
 }

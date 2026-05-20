@@ -102,8 +102,8 @@ export function CampaignsTable() {
         });
 
         setCampaigns(merged);
-      } catch (err: any) {
-        setError(err?.message || t("loadError"));
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : t("loadError"));
       } finally {
         setLoading(false);
       }

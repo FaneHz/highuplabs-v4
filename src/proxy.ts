@@ -57,8 +57,8 @@ export async function proxy(request: NextRequest) {
     if (!isPublic && !user && pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
-  } catch {
-    // Ignore auth errors, let layouts handle auth
+  } catch (err) {
+    console.warn("[proxy] Auth check failed:", err instanceof Error ? err.message : String(err));
   }
 
   return response;

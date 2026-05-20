@@ -30,7 +30,7 @@ export async function getHistoricalData(days: number = 30): Promise<DailyMetrics
 
   const grouped = new Map<string, DailyMetrics>();
 
-  data.forEach((row: any) => {
+  data.forEach((row: Pick<CampaignSnapshot, 'date' | 'spend' | 'revenue' | 'impressions' | 'clicks' | 'conversions'>) => {
     const dateKey = typeof row.date === "string" ? row.date.slice(0, 10) : format(new Date(row.date), "yyyy-MM-dd");
     const existing = grouped.get(dateKey);
 

@@ -5,14 +5,14 @@ import roMessages from "@/messages/ro.json";
 import enMessages from "@/messages/en.json";
 import { Locale } from "@/lib/i18n";
 
-const messagesMap: Record<Locale, any> = {
-  ro: roMessages,
-  en: enMessages,
+const messagesMap: Record<Locale, Record<string, unknown>> = {
+  ro: roMessages as Record<string, unknown>,
+  en: enMessages as Record<string, unknown>,
 };
 
-const LocaleContext = createContext<{ locale: Locale; messages: any }>({
+const LocaleContext = createContext<{ locale: Locale; messages: Record<string, unknown> }>({
   locale: "ro",
-  messages: roMessages,
+  messages: roMessages as Record<string, unknown>,
 });
 
 export function LocaleProvider({
@@ -36,26 +36,27 @@ export function useLocale() {
 export function useTranslations(namespace?: string) {
   const { locale, messages } = useContext(LocaleContext);
 
-  function getValue(key: string): any {
+  function getValue(key: string): unknown {
     const keys = namespace ? `${namespace}.${key}`.split(".") : key.split(".");
-    let value: any = messages;
+    let obj: unknown = messages;
     for (const k of keys) {
-      value = value?.[k];
+      if (typeof obj !== "object" || obj === null) return undefined;
+      obj = (obj as Record<string, unknown>)[k];
     }
-    return value;
+    return obj;
   }
 
-  function t(key: string, options?: Record<string, any>): any {
+  function t(key: string, options?: Record<string, unknown>): any {
     const value = getValue(key);
 
     if (typeof value === "string") {
       return interpolate(value, options);
     }
 
-    if (typeof value === "object" && options?.count !== undefined) {
+    if (typeof value === "object" && value !== null && options?.count !== undefined) {
       const count = Number(options.count);
       const pluralKey = count === 1 ? "one" : "other";
-      const pluralValue = value?.[pluralKey];
+      const pluralValue = (value as Record<string, unknown>)[pluralKey];
       if (typeof pluralValue === "string") {
         return interpolate(pluralValue, options);
       }
@@ -64,7 +65,7 @@ export function useTranslations(namespace?: string) {
     return value ?? key;
   }
 
-  function interpolate(template: string, values?: Record<string, any>): string {
+  function interpolate(template: string, values?: Record<string, unknown>): string {
     if (!values) return template;
     return template.replace(/\{(\w+)\}/g, (_match, name) => {
       const val = values[name];
@@ -72,7 +73,7 @@ export function useTranslations(namespace?: string) {
     });
   }
 
-  function rich(key: string, options?: Record<string, any>): ReactNode {
+  function rich(key: string, options?: Record<string, unknown>): ReactNode {
     const value = getValue(key);
     if (typeof value !== "string") return key;
 

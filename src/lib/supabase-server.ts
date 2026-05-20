@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-function createErrorProxy(message: string): any {
+function createErrorProxy(message: string): ReturnType<typeof createServerClient> {
   const dataProxy = new Proxy({}, {
     get() { return null; }
   });
@@ -15,7 +15,7 @@ function createErrorProxy(message: string): any {
     apply() {
       return createErrorProxy(message);
     },
-  });
+  }) as unknown as ReturnType<typeof createServerClient>;
 }
 
 export async function createClient() {
@@ -26,7 +26,7 @@ export async function createClient() {
 
   if (!url || !key) {
     console.warn("Missing Supabase environment variables");
-    return createErrorProxy("Supabase not configured") as any;
+    return createErrorProxy("Supabase not configured");
   }
 
   return createServerClient(url, key, {
@@ -39,9 +39,10 @@ export async function createClient() {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options)
           );
-        } catch {
+        } catch (err) {
           // The `setAll` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing sessions.
+          console.warn("[supabase-server] Cookie setAll failed (expected in Server Components):", err instanceof Error ? err.message : String(err));
         }
       },
     },

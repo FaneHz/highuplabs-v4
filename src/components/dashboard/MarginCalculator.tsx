@@ -347,7 +347,7 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
       try {
         const data: CalculatorScenarioRecord[] = await getCalculatorScenarios();
         setScenarios(
-          data.map((s) => ({
+          data.map((s: CalculatorScenarioRecord) => ({
             id: s.id,
             name: s.name,
             created_at: s.created_at,
@@ -355,8 +355,8 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
             results: s.results as CalculatorScenario["results"],
           }))
         );
-      } catch {
-        // Silently fail - scenarios are non-critical
+      } catch (err) {
+        console.error("[MarginCalculator] Failed to load scenarios:", err);
       } finally {
         setScenariosLoading(false);
       }
@@ -441,8 +441,8 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
         results: saved.results as CalculatorScenario["results"],
       };
       setScenarios((prev) => [newScenario, ...prev]);
-    } catch {
-      // Silently fail or could show toast
+    } catch (err) {
+      console.error("[MarginCalculator] Failed to save scenario:", err);
     }
   }, [inputs, results]);
 
@@ -451,8 +451,8 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
       await deleteCalculatorScenario(id);
       setScenarios((prev) => prev.filter((s) => s.id !== id));
       setCompareScenarios((prev) => prev.filter((s) => s.id !== id));
-    } catch {
-      // Silently fail
+    } catch (err) {
+      console.error("[MarginCalculator] Failed to delete scenario:", err);
     }
   }, []);
 

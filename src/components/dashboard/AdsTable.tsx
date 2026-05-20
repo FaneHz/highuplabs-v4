@@ -93,8 +93,8 @@ export function AdsTable() {
         setError("");
         const data = await getMetaAdInsights("last_30d");
         setAds(data.ads);
-      } catch (err: any) {
-        setError(err?.message || t("loadError"));
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : t("loadError"));
       } finally {
         setLoading(false);
       }

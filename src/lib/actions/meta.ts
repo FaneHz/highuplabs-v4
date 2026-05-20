@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase-server";
 import { fetchMetaCampaigns, fetchMetaAds, fetchMetaInsights, getPurchaseRevenue } from "@/lib/meta-api";
 import { decryptToken, encryptToken, getMetaLongLivedToken } from "@/lib/meta-auth";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 async function getActiveMetaAccount() {
   const supabase = await createClient();
@@ -38,7 +39,7 @@ async function getActiveMetaAccount() {
 }
 
 export async function refreshMetaTokenIfNeeded(
-  supabase: any,
+  supabase: SupabaseClient,
   clientId: string,
   accountId: string,
   currentToken: string,
