@@ -28,7 +28,7 @@ export function getTranslations(locale: Locale, namespace?: string) {
     return obj;
   }
 
-  function t(key: string, options?: Record<string, unknown>): any {
+  function t(key: string, options?: Record<string, unknown>): string {
     const value = getValue(key);
 
     if (typeof value === "string") {
@@ -44,7 +44,7 @@ export function getTranslations(locale: Locale, namespace?: string) {
       }
     }
 
-    return value ?? key;
+    return typeof value === "string" ? value : key;
   }
 
   return Object.assign(t, { raw: getValue });

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Check, ExternalLink, ArrowRight, ArrowLeft, Building2, Bell, BarChart3 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { updateClientSettings } from "@/lib/actions/settings";
@@ -12,7 +11,7 @@ interface OnboardingWizardProps {
   onComplete?: () => void;
 }
 
-export function OnboardingWizard({ clientId, metaOAuthUrl, onComplete }: OnboardingWizardProps) {
+export function OnboardingWizard({ clientId: _clientId, metaOAuthUrl, onComplete }: OnboardingWizardProps) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     company_name: "",
@@ -21,7 +20,6 @@ export function OnboardingWizard({ clientId, metaOAuthUrl, onComplete }: Onboard
   });
   const [saving, setSaving] = useState(false);
   const { showToast } = useToast();
-  const router = useRouter();
 
   const steps = [
     {
@@ -61,7 +59,7 @@ export function OnboardingWizard({ clientId, metaOAuthUrl, onComplete }: Onboard
         fd.append("alert_notifications", form.alert_notifications ? "on" : "off");
         await updateClientSettings(fd);
         showToast("Date salvate", "success");
-      } catch (err) {
+      } catch {
         showToast("Eroare la salvare", "error");
       } finally {
         setSaving(false);

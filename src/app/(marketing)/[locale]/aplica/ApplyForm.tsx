@@ -3,32 +3,18 @@
 import { useState } from "react";
 import { useForm, FormProvider, UseFormRegister } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useLocale } from "@/lib/i18n-context";
 import Link from "next/link";
+import { applicationSchema, type ApplicationInput } from "@/lib/schemas/application";
 
-const schema = z.object({
-  name: z.string().min(2, "Minim 2 caractere"),
-  email: z.string().email("Email invalid"),
-  phone: z.string().min(6, "Minim 6 cifre").optional().or(z.literal("")),
-  website: z.string().optional().or(z.literal("")),
-  sales: z.string().min(1, "Obligatoriu"),
-  budget: z.string().min(1, "Obligatoriu"),
-  message: z.string().max(2000).optional(),
-  honeypot: z.literal("").optional(),
-});
-
-type FormData = z.infer<typeof schema>;
+const schema = applicationSchema;
+type FormData = ApplicationInput;
 
 const steps = [
   { id: 0, labelRo: "Date contact", labelEn: "Contact" },
   { id: 1, labelRo: "Business", labelEn: "Business" },
   { id: 2, labelRo: "Confirmare", labelEn: "Confirm" },
 ];
-
-export async function generateStaticParams() {
-  return [{ locale: "ro" }, { locale: "en" }];
-}
 
 export default function ApplyPage() {
   const locale = useLocale();

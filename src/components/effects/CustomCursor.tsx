@@ -32,26 +32,21 @@ export default function CustomCursor() {
       rafId = requestAnimationFrame(loop);
     };
 
-    let rotation = 0;
-    let targetRotation = 0;
-
-    const updateRotation = () => {
-      rotation += (targetRotation - rotation) * 0.15;
-      cursor.style.transform = `translate3d(${cx - 4}px, ${cy - 4}px, 0) rotate(${rotation}deg)`;
-    };
+    const rotation = 0;
+    let _targetRotation = 0;
 
     window.addEventListener("mousemove", onMove);
     rafId = requestAnimationFrame(loop);
 
     const onEnter = () => {
-      targetRotation = 45;
+      _targetRotation = 45;
       cursor.style.width = "12px";
       cursor.style.height = "12px";
       cursor.style.marginLeft = "-4px";
       cursor.style.marginTop = "-4px";
     };
     const onLeave = () => {
-      targetRotation = 0;
+      _targetRotation = 0;
       cursor.style.width = "8px";
       cursor.style.height = "8px";
       cursor.style.marginLeft = "0px";

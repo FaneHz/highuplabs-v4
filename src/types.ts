@@ -22,11 +22,12 @@ export interface Application {
   name: string;
   email: string;
   phone?: string;
-  company?: string;
   website?: string;
-  industry?: string;
-  budget?: string;
+  monthly_sales: string;
+  ad_budget: string;
   message?: string;
+  ip_address?: string;
+  source?: string;
   status?: string;
   created_at?: string;
 }

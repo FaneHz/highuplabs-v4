@@ -78,17 +78,6 @@ export function ScenarioComparison({
     }
   }
 
-  const allScenarios = [
-    {
-      id: "current",
-      name: "Curent",
-      created_at: new Date().toISOString(),
-      inputs: currentInputs,
-      results: currentResults,
-    },
-    ...scenarios,
-  ];
-
   const comparisonScenarios = compareScenarios.length > 0
     ? [
         {

@@ -39,7 +39,7 @@ export default function AboutContent() {
             {t("model.label")}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 border border-[#1A1A1A]">
-            {(t("model.items") as Array<{ num: string; title: string; desc: string }>).map((v) => (
+            {(t.raw("model.items") as unknown as Array<{ num: string; title: string; desc: string }>).map((v) => (
               <div key={v.num} className="p-8 md:p-12 border-b lg:border-b-0 lg:border-r last:border-r-0 border-[#1A1A1A]">
                 <div className="text-[10px] font-mono text-[#CCFF00] mb-4">{v.num}</div>
                 <h3 className="text-xl font-bold text-white mb-3">{v.title}</h3>
@@ -56,7 +56,7 @@ export default function AboutContent() {
               {t("values.label")}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              {(t("values.items") as Array<{ num: string; title: string; desc: string }>).map((v) => (
+              {(t.raw("values.items") as unknown as Array<{ num: string; title: string; desc: string }>).map((v) => (
                 <div key={v.num} className="p-8 md:p-12 border-b md:border-r border-[#1A1A1A] last:border-b-0 even:md:border-r-0">
                   <div className="text-[10px] font-mono text-[#CCFF00] mb-4">{v.num}</div>
                   <h3 className="text-xl font-bold text-white mb-3">{v.title}</h3>

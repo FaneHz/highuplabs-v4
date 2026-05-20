@@ -34,7 +34,7 @@ export function useLocale() {
 }
 
 export function useTranslations(namespace?: string) {
-  const { locale, messages } = useContext(LocaleContext);
+  const { messages } = useContext(LocaleContext);
 
   function getValue(key: string): unknown {
     const keys = namespace ? `${namespace}.${key}`.split(".") : key.split(".");
@@ -46,7 +46,7 @@ export function useTranslations(namespace?: string) {
     return obj;
   }
 
-  function t(key: string, options?: Record<string, unknown>): any {
+  function t(key: string, options?: Record<string, unknown>): string {
     const value = getValue(key);
 
     if (typeof value === "string") {
@@ -62,7 +62,7 @@ export function useTranslations(namespace?: string) {
       }
     }
 
-    return value ?? key;
+    return typeof value === "string" ? value : key;
   }
 
   function interpolate(template: string, values?: Record<string, unknown>): string {
@@ -91,5 +91,5 @@ export function useTranslations(namespace?: string) {
     });
   }
 
-  return Object.assign(t, { rich });
+  return Object.assign(t, { rich, raw: getValue });
 }

@@ -225,7 +225,7 @@ export async function askAIAdvisor(
     validatedMessages = advisorMessagesSchema.parse(
       messages.map(m => ({ role: m.role, content: m.content }))
     );
-  } catch (validationError) {
+  } catch {
     await logAction('ai_advisor_validation_error', { user_id: user.id });
     throw new Error('Invalid message format');
   }

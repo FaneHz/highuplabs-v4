@@ -113,7 +113,7 @@ export default function DataStrip() {
           {[...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
             <span key={i} className="mx-6 text-[10px] font-mono text-[#333333] uppercase tracking-[0.3em]">
               {item}
-              <span className="mx-6 text-[#CCFF00]">//</span>
+              <span className="mx-6 text-[#CCFF00]">{"//"}</span>
             </span>
           ))}
         </div>

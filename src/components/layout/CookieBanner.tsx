@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Locale } from "@/lib/i18n";
-import { useTranslations } from "@/lib/i18n-context";
 import { useAppConfig } from "@/lib/use-app-config";
 
 interface Consent {
@@ -73,24 +72,26 @@ function injectGA4(allowed: boolean, gaId: string) {
 }
 
 export default function CookieBanner({ locale }: { locale: Locale }) {
-  const t = useTranslations("cookieBanner");
   const { config } = useAppConfig();
   const metaPixelId = config.meta_pixel_id || process.env.NEXT_PUBLIC_META_PIXEL_ID || "";
   const gaId = config.ga_id || process.env.NEXT_PUBLIC_GA_ID || "";
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = loadConsent();
+    return !saved;
+  });
   const [customize, setCustomize] = useState(false);
-  const [consent, setConsent] = useState<Consent>({
-    essential: true,
-    analytics: false,
-    marketing: false,
+  const [consent, setConsent] = useState<Consent>(() => {
+    if (typeof window !== "undefined") {
+      const saved = loadConsent();
+      if (saved) return saved;
+    }
+    return { essential: true, analytics: false, marketing: false };
   });
 
   useEffect(() => {
     const saved = loadConsent();
-    if (!saved) {
-      setVisible(true);
-    } else {
-      setConsent(saved);
+    if (saved) {
       injectPixel(saved.marketing, metaPixelId);
       injectGA4(saved.analytics, gaId);
     }

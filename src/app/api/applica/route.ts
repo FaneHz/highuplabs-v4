@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
 import { getAppConfig, getAppConfigNumber } from "@/lib/app-config";
+import { applicationSchema } from "@/lib/schemas/application";
+import fs from "fs";
+import path from "path";
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || apiKey.includes('xxx') || apiKey.includes('placeholder')) {
-    console.error("RESEND_API_KEY nu este configurat corect");
+    console.warn("RESEND_API_KEY nu este configurat corect — email-urile nu se vor trimite");
     return null;
   }
   return new Resend(apiKey);
@@ -20,37 +22,53 @@ function getSupabase() {
   return createClient(url, key);
 }
 
-const applicationSchema = z.object({
-  name: z.string().min(2, "Numele trebuie să aibă minim 2 caractere").max(100),
-  email: z.string().email("Adresa de email nu este validă"),
-  phone: z.string().min(6).max(20).optional().or(z.literal("")),
-  website: z.string().optional().or(z.literal("")),
-  sales: z.string().min(1, "Completează vânzările lunare"),
-  budget: z.string().min(1, "Completează bugetul de reclame"),
-  message: z.string().max(2000).optional(),
-  honeypot: z.literal("").optional(),
-});
+const RATE_LIMIT_FILE = path.join("/tmp", "rate-limit-applica.json");
 
-const ipRequests = new Map<string, number[]>();
+interface RateLimitEntry {
+  timestamps: number[];
+}
+
+function loadRateLimitData(): Record<string, RateLimitEntry> {
+  try {
+    if (fs.existsSync(RATE_LIMIT_FILE)) {
+      const raw = fs.readFileSync(RATE_LIMIT_FILE, "utf-8");
+      return JSON.parse(raw);
+    }
+  } catch {
+    // corrupted or unreadable — start fresh
+  }
+  return {};
+}
+
+function saveRateLimitData(data: Record<string, RateLimitEntry>): void {
+  try {
+    fs.writeFileSync(RATE_LIMIT_FILE, JSON.stringify(data), "utf-8");
+  } catch {
+    // /tmp full or read-only — degrade gracefully
+  }
+}
 
 async function getRateLimitConfig() {
-  const window = await getAppConfigNumber("rate_limit_window_ms", 60 * 60 * 1000);
+  const windowMs = await getAppConfigNumber("rate_limit_window_ms", 60 * 60 * 1000);
   const max = await getAppConfigNumber("rate_limit_max", 5);
-  return { window, max };
+  return { windowMs, max };
 }
 
 async function isRateLimited(ip: string): Promise<boolean> {
-  const { window, max } = await getRateLimitConfig();
+  const { windowMs, max } = await getRateLimitConfig();
   const now = Date.now();
-  const requests = ipRequests.get(ip) || [];
-  const recentRequests = requests.filter((time) => now - time < window);
+  const data = loadRateLimitData();
 
-  if (recentRequests.length >= max) {
+  const entry = data[ip] || { timestamps: [] };
+  const recent = entry.timestamps.filter((t) => now - t < windowMs);
+
+  if (recent.length >= max) {
     return true;
   }
 
-  recentRequests.push(now);
-  ipRequests.set(ip, recentRequests);
+  recent.push(now);
+  data[ip] = { timestamps: recent };
+  saveRateLimitData(data);
   return false;
 }
 
@@ -117,31 +135,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Trimite email via Resend (nu blocăm submit-ul dacă emailul eșuează)
-    try {
-      const resend = getResend();
-      if (resend) {
-        const fromEmail = await getAppConfig("email_from") || "High-Up Labs <noreply@highuplabs.ro>";
-        const toEmail = await getAppConfig("email_to") || "business@highuplabs.ro";
-        await resend.emails.send({
-          from: fromEmail,
-          to: toEmail,
-          subject: `Aplicație nouă: ${data.name}`,
-          html: `
-            <h2>Aplicație nouă primită</h2>
-            <p><strong>Nume:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Telefon:</strong> ${data.phone || "N/A"}</p>
-            <p><strong>Website:</strong> ${data.website || "N/A"}</p>
-            <p><strong>Vânzări lunare:</strong> ${data.sales}</p>
-            <p><strong>Buget reclame:</strong> ${data.budget}</p>
-            <p><strong>Mesaj:</strong> ${data.message || "N/A"}</p>
-          `,
-        });
+    // 2. Trimite email via Resend DOAR dacă s-a salvat în DB
+    if (dbSaved) {
+      try {
+        const resend = getResend();
+        if (resend) {
+          const fromEmail = await getAppConfig("email_from") || "High-Up Labs <noreply@highuplabs.ro>";
+          const toEmail = await getAppConfig("email_to") || "business@highuplabs.ro";
+          await resend.emails.send({
+            from: fromEmail,
+            to: toEmail,
+            subject: `Aplicație nouă: ${data.name}`,
+            html: `
+              <h2>Aplicație nouă primită</h2>
+              <p><strong>Nume:</strong> ${data.name}</p>
+              <p><strong>Email:</strong> ${data.email}</p>
+              <p><strong>Telefon:</strong> ${data.phone || "N/A"}</p>
+              <p><strong>Website:</strong> ${data.website || "N/A"}</p>
+              <p><strong>Vânzări lunare:</strong> ${data.sales}</p>
+              <p><strong>Buget reclame:</strong> ${data.budget}</p>
+              <p><strong>Mesaj:</strong> ${data.message || "N/A"}</p>
+            `,
+          });
+        } else {
+          console.warn("Email not sent — RESEND_API_KEY missing. Set it in Vercel Dashboard.");
+        }
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
       }
-    } catch (emailError) {
-      console.error("Email sending failed:", emailError);
-      // Nu returnăm 500 - aplicația a fost salvată în DB
     }
 
     return NextResponse.json({ success: true });

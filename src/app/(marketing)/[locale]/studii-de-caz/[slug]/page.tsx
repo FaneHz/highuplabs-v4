@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { allCases } from "@/content/cases";
 import Link from "next/link";
-import { getTranslations } from "@/lib/i18n-server";
 import { locales } from "@/lib/i18n";
 
 export async function generateStaticParams() {
@@ -165,7 +164,7 @@ export default async function CasePage({
 
                 {section.type === "quote" && section.text && (
                   <blockquote className="my-8 border-l-2 border-[#CCFF00] pl-6 py-2">
-                    <p className="text-lg md:text-xl text-white italic leading-relaxed">"{section.text}"</p>
+                    <p className="text-lg md:text-xl text-white italic leading-relaxed">&quot;{section.text}&quot;</p>
                     {section.attribution && (
                       <footer className="mt-4 text-[10px] font-mono text-[#A3A3A3] uppercase tracking-wider">
                         {section.attribution}

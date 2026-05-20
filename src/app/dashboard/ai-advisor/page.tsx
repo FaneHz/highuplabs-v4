@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { AIAdvisorChat } from "@/components/dashboard/AIAdvisorChat";
 import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
@@ -7,10 +6,6 @@ import { getMetaInsights } from "@/lib/actions/meta";
 export default async function AIAdvisorPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
 
   const { data: client } = await supabase
     .from("clients")

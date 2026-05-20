@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase-server";
 import type { CampaignSnapshot, AlertRule, DailyMetrics } from "@/types";
-import { subDays, format, parseISO } from "date-fns";
+import { subDays, format } from "date-fns";
 
 async function getCurrentUserId() {
   const supabase = await createClient();

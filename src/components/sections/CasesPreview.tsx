@@ -66,7 +66,7 @@ export default function CasesPreview() {
               [07] STUDII DE CAZ
             </span>
             <h2 className="mt-6 text-4xl md:text-6xl font-black uppercase tracking-[-0.03em] text-white">
-              "De la 0 la 50.000 € în 90 de zile" — nu e un pitch, e un client
+              &quot;De la 0 la 50.000 € în 90 de zile&quot; — nu e un pitch, e un client
             </h2>
           </div>
           <Link

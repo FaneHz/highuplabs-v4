@@ -15,8 +15,6 @@ import {
   Trash2,
   Check,
   AlertTriangle,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 
 interface AlertsPanelProps {
@@ -28,7 +26,6 @@ interface AlertsPanelProps {
 export function AlertsPanel({ alerts, triggeredAlerts, onUpdate }: AlertsPanelProps) {
   const { showToast } = useToast();
   const [showForm, setShowForm] = useState(false);
-  const [expandedAlert, setExpandedAlert] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     metric: "ROAS" as AlertRule["metric"],
     operator: "<" as AlertRule["operator"],

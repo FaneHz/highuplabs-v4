@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "@/lib/i18n-context";
 import { analyzeWebsite, WebsiteAnalysisResult } from "@/lib/actions/ai";
 import {
   Search,
@@ -118,7 +117,6 @@ function LoadingState() {
 }
 
 export function WebsiteAnalyzer() {
-  const t = useTranslations("dashboard");
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WebsiteAnalysisResult | null>(null);

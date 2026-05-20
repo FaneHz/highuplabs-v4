@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { askAIAdvisor, getAdvisorHistory, clearAdvisorHistory } from '@/lib/actions/ai-advisor';
 import { AdvisorMessage } from '@/lib/actions/ai-advisor';
-import { Send, Loader2, Trash2, Bot, User, Sparkles, TrendingUp, DollarSign, Target, BarChart3 } from 'lucide-react';
+import { Send, Loader2, Trash2, Bot, User, Sparkles, TrendingUp, Target, BarChart3, DollarSign } from 'lucide-react';
 
 interface AIAdvisorChatProps {
   clientId: string;
@@ -66,7 +66,6 @@ function renderMarkdown(text: string): React.ReactNode {
 
     // Inline code
     const inlineCodeRegex = /`([^`]+)`/g;
-    let processedLine = line;
     const inlineCodes: { text: string; key: number }[] = [];
     let match;
     let key = 0;
@@ -137,7 +136,7 @@ function renderMarkdown(text: string): React.ReactNode {
 
 function renderInlineFormatting(text: string): React.ReactNode {
   // Bold
-  let parts = text.split(/(\*\*.*?\*\*)/g);
+  const parts = text.split(/(\*\*.*?\*\*)/g);
   
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
@@ -208,7 +207,7 @@ function LoadingIndicator() {
   );
 }
 
-export function AIAdvisorChat({ clientId, companyName, metaContext, calculatorContext }: AIAdvisorChatProps) {
+export function AIAdvisorChat({ clientId: _clientId, companyName, metaContext, calculatorContext }: AIAdvisorChatProps) {
   const [messages, setMessages] = useState<AdvisorMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -257,38 +256,45 @@ export function AIAdvisorChat({ clientId, companyName, metaContext, calculatorCo
     setIsLoading(true);
 
     try {
-      const allMessages = [...messages, userMessage];
-      
-      // Build extra context
-      const extraContext: Record<string, unknown> = {};
-      if (metaContext) {
-        extraContext.meta = metaContext;
-      }
-      if (calculatorContext) {
-        extraContext.calculator = calculatorContext;
-      }
+      setMessages(prev => {
+        const allMessages = [...prev, userMessage];
+        
+        const extraContext: Record<string, unknown> = {};
+        if (metaContext) {
+          extraContext.meta = metaContext;
+        }
+        if (calculatorContext) {
+          extraContext.calculator = calculatorContext;
+        }
 
-      const response = await askAIAdvisor(allMessages, extraContext);
+        askAIAdvisor(allMessages, extraContext)
+          .then(response => {
+            const assistantMessage: AdvisorMessage = {
+              role: 'assistant',
+              content: response.content,
+            };
+            setMessages(p => [...p, assistantMessage]);
+          })
+          .catch(error => {
+            const errorMessage = error instanceof Error ? error.message : 'A apărut o eroare';
+            setMessages(p => [
+              ...p,
+              {
+                role: 'assistant',
+                content: `A aparut o eroare: ${errorMessage}. Incearca din nou.`,
+              },
+            ]);
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
 
-      const assistantMessage: AdvisorMessage = {
-        role: 'assistant',
-        content: response.content,
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'A apărut o eroare';
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: `❌ ${errorMessage}. Încearcă din nou.`,
-        },
-      ]);
-    } finally {
+        return allMessages;
+      });
+    } catch {
       setIsLoading(false);
     }
-  }, [messages, isLoading, metaContext, calculatorContext]);
+  }, [isLoading, metaContext, calculatorContext]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

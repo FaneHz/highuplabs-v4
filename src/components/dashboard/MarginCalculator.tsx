@@ -125,7 +125,7 @@ interface Recommendation {
 }
 
 function generateRecommendations(inputs: CalculatorInputs, results: ReturnType<typeof useCalculatorResults>): Recommendation[] {
-  const { revenue, cogs, adSpend, fixedCosts, agencyFeePercent } = inputs;
+  const { revenue, cogs, adSpend } = inputs;
   const { netMargin, ebitda, breakEvenRevenue, agencyFee } = results;
   const recs: Recommendation[] = [];
 
@@ -204,7 +204,7 @@ interface ActionItem {
 }
 
 function generateActionItems(inputs: CalculatorInputs, results: ReturnType<typeof useCalculatorResults>): ActionItem[] {
-  const { revenue, cogs, adSpend, fixedCosts, agencyFeePercent } = inputs;
+  const { revenue, cogs, adSpend, agencyFeePercent } = inputs;
   const { netMargin, ebitda, breakEvenRevenue } = results;
   const items: ActionItem[] = [];
 
@@ -338,12 +338,10 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
   // Scenarios state
   const [scenarios, setScenarios] = useState<CalculatorScenario[]>([]);
   const [compareScenarios, setCompareScenarios] = useState<CalculatorScenario[]>([]);
-  const [scenariosLoading, setScenariosLoading] = useState(false);
 
   // Load scenarios from Supabase on mount
   useEffect(() => {
     async function load() {
-      setScenariosLoading(true);
       try {
         const data: CalculatorScenarioRecord[] = await getCalculatorScenarios();
         setScenarios(
@@ -357,8 +355,6 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
         );
       } catch (err) {
         console.error("[MarginCalculator] Failed to load scenarios:", err);
-      } finally {
-        setScenariosLoading(false);
       }
     }
     load();
@@ -830,7 +826,7 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
             </div>
             <h3 className="font-heading font-bold text-lg">AI Financial Advisor</h3>
             <p className="font-mono text-sm text-[var(--color-muted)]">
-              Completează toate câmpurile și apasă "Calculează" pentru a primi o analiză completă cu AI.
+              CompleteazÄƒ toate câmpurile È™i apasÄƒ &quot;CalculeazÄƒ&quot; pentru a primi o analizÄƒ completÄƒ cu AI.
             </p>
             <div className="space-y-2 text-left">
               <div className="flex items-center gap-2">

@@ -6,11 +6,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Calculator, 
-  TrendingUp, 
-  Target, 
-  DollarSign, 
-  Percent, 
   Mail, 
   Building2,
   Phone,
@@ -295,6 +290,9 @@ export default function OfferCalculator() {
         scrollTrigger: { trigger: section, start: "top 60%" },
       }
     );
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   }, []);
 
   const handleCalculate = () => {
@@ -424,7 +422,7 @@ export default function OfferCalculator() {
       try {
         const functionsUrl = config.supabase_functions_url || "https://qpuswbcxegxvgjbwinrq.supabase.co/functions/v1";
         const emailResponse = await fetch(
-          "https://qpuswbcxegxvgjbwinrq.supabase.co/functions/v1/send-offer-email",
+          `${functionsUrl}/send-offer-email`,
           {
             method: "POST",
             headers: {

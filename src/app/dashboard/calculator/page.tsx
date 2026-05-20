@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-server";
 import { getMetaInsights } from "@/lib/actions/meta";
@@ -8,16 +7,6 @@ import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
 export default async function CalculatorPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: client } = await supabase
-    .from("clients")
-    .select("id, company_name")
-    .eq("id", user.id)
-    .single();
 
   const { data: platforms } = await supabase
     .from("client_platform_accounts")

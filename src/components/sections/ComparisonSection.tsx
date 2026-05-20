@@ -64,7 +64,7 @@ export default function ComparisonSection() {
               HIGH-UP.LABS
             </div>
             <div className="p-4 md:p-6 text-[10px] font-mono text-[#A3A3A3] uppercase tracking-[0.2em]">
-              Agenteia "Standard"
+              Agenteia &quot;Standard&quot;
             </div>
           </div>
 

@@ -18,68 +18,6 @@ import { AlertsPanel, AlertsPanelSkeleton } from "./AlertsPanel";
 import { CampaignPerformanceTable, CampaignPerformanceTableSkeleton } from "./CampaignPerformanceTable";
 import type { DailyMetrics, CampaignSnapshot, AlertRule } from "@/types";
 
-interface CampaignMetric {
-  campaignId: string;
-  campaignName: string;
-  spend: number;
-  revenue: number;
-  impressions: number;
-  clicks: number;
-  conversions: number;
-  roas: number;
-  ctr: number;
-  cpc: number;
-}
-
-interface Totals {
-  totalSpend: number;
-  totalRevenue: number;
-  totalImpressions: number;
-  totalClicks: number;
-  totalConversions: number;
-  roas: number;
-  ctr: number;
-  cpc: number;
-}
-
-function KpiCard({
-  label,
-  value,
-  prefix = "",
-  suffix = "",
-}: {
-  label: string;
-  value: number | string;
-  prefix?: string;
-  suffix?: string;
-}) {
-  const formatted = typeof value === "number"
-    ? value.toLocaleString("ro-RO", { maximumFractionDigits: 0 })
-    : value;
-
-  return (
-    <div className="brutal-card p-5">
-      <p className="text-xs font-mono uppercase tracking-wider text-[var(--color-muted)] mb-2">
-        {label}
-      </p>
-      <p className="font-mono text-2xl font-bold text-[var(--color-ink)]">
-        {prefix}
-        {formatted}
-        {suffix}
-      </p>
-    </div>
-  );
-}
-
-function SkeletonKpiCard() {
-  return (
-    <div className="brutal-card p-5">
-      <div className="skeleton-shimmer h-3 w-20 mb-4 rounded-none" />
-      <div className="skeleton-shimmer h-8 w-32 rounded-none" />
-    </div>
-  );
-}
-
 export function DashboardOverview({
   clientId,
   companyName,
@@ -90,7 +28,6 @@ export function DashboardOverview({
   const t = useTranslations("dashboard");
   const { showToast } = useToast();
 
-  const [metaData, setMetaData] = useState<{ campaigns: CampaignMetric[]; totals: Totals } | null>(null);
   const [historicalData, setHistoricalData] = useState<DailyMetrics[]>([]);
   const [previousData, setPreviousData] = useState<DailyMetrics[]>([]);
   const [campaigns, setCampaigns] = useState<CampaignSnapshot[]>([]);
@@ -109,8 +46,7 @@ export function DashboardOverview({
   const loadAllData = useCallback(async () => {
     try {
       setLoadingMeta(true);
-      const metaResult = await getMetaInsights("last_30d");
-      setMetaData(metaResult);
+      await getMetaInsights("last_30d");
       setMetaConnected(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t("loadError");
@@ -174,11 +110,13 @@ export function DashboardOverview({
     } finally {
       setLoadingAlerts(false);
     }
-  }, [t, showToast]);
+  }, [showToast]);
 
+  /* eslint-disable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect -- t changes every render (infinite loop risk); data loading on mount is standard pattern */
   useEffect(() => {
     loadAllData();
   }, [loadAllData]);
+  /* eslint-enable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect */
 
   const filteredHistorical = historicalData.slice(-timeRange);
   const filteredPrevious = previousData.slice(-timeRange);

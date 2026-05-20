@@ -1,17 +1,8 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
 import { VideoScriptGenerator } from "@/components/dashboard/VideoScriptGenerator";
 import { SocialMediaStrategist } from "@/components/dashboard/SocialMediaStrategist";
 import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
 
 export default async function SocialPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
   return (
     <div className="space-y-12">
       <div>

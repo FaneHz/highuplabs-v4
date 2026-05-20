@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
@@ -6,10 +5,6 @@ import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
 export default async function OverviewPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
 
   const { data: client, error: clientError } = await supabase
     .from("clients")

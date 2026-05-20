@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { useLocale } from "@/lib/i18n-context";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -87,6 +89,7 @@ function CircularProgress({ score, max }: { score: number; max: number }) {
 
 export default function QualifySection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const locale = useLocale();
   const [checked, setChecked] = useState<boolean[]>(new Array(questions.length).fill(false));
   const [revealedTips, setRevealedTips] = useState<Set<number>>(new Set());
 
@@ -239,34 +242,34 @@ export default function QualifySection() {
                 [URMĂTORUL PAS]
               </div>
               {score === 5 ? (
-                <a
-                  href="/ro/aplica"
+                <Link
+                  href={`/${locale}/aplica`}
                   className="block w-full py-4 bg-[#CCFF00] text-black text-xs font-mono font-bold uppercase tracking-[0.2em] text-center hover:bg-[#99CC00] transition-colors"
                 >
-                  PROGRAMEAZĂ CALL-UL GRATUIT
-                </a>
+                  PROGRAMEAZÄ€ CALL-UL GRATUIT
+                </Link>
               ) : score >= 3 ? (
                 <div className="space-y-3">
-                  <a
-                    href="/ro/aplica"
+                  <Link
+                    href={`/${locale}/aplica`}
                     className="block w-full py-4 bg-[#CCFF00] text-black text-xs font-mono font-bold uppercase tracking-[0.2em] text-center hover:bg-[#99CC00] transition-colors"
                   >
-                      PROGRAMEAZĂ DIAGNOSTIC GRATUIT
-                  </a>
-                  <a
-                    href="/ro/articole"
+                      PROGRAMEAZÄ€ DIAGNOSTIC GRATUIT
+                  </Link>
+                  <Link
+                    href={`/${locale}/articole`}
                     className="block w-full py-4 border border-[#1A1A1A] text-white text-xs font-mono font-bold uppercase tracking-[0.2em] text-center hover:border-[#CCFF00] hover:text-[#CCFF00] transition-colors"
                   >
-                      CITEȘTE ARTICOLELE
-                  </a>
+                      CITEÈ˜TE ARTICOLELE
+                  </Link>
                 </div>
               ) : (
-                <a
-                  href="/ro/articole"
+                <Link
+                  href={`/${locale}/articole`}
                   className="block w-full py-4 border border-[#1A1A1A] text-white text-xs font-mono font-bold uppercase tracking-[0.2em] text-center hover:border-[#CCFF00] hover:text-[#CCFF00] transition-colors"
                 >
-                    CITEȘTE EDUCAȚIA GRATUITĂ
-                </a>
+                    CITEÈ˜TE EDUCAÈ˚IA GRATUITÄ€
+                </Link>
               )}
             </div>
           </div>

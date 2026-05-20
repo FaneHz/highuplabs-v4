@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { allArticles } from "@/content/articles";
 import ArticleRenderer from "@/components/content/ArticleRenderer";
 import Link from "next/link";
-import { getTranslations } from "@/lib/i18n-server";
 import { locales } from "@/lib/i18n";
 
 export async function generateStaticParams() {

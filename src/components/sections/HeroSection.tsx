@@ -11,9 +11,7 @@ function Particles() {
   const mouseRef = useRef({ x: 0, y: 0 });
 
   const count = 2000;
-  const [positions, setPositions] = useState<Float32Array | null>(null);
-
-  useEffect(() => {
+  const [positions] = useState<Float32Array>(() => {
     const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
@@ -23,8 +21,8 @@ function Particles() {
       pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       pos[i * 3 + 2] = r * Math.cos(phi);
     }
-    setPositions(pos);
-  }, []);
+    return pos;
+  });
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
@@ -36,7 +34,7 @@ function Particles() {
   }, []);
 
   useFrame((state) => {
-    if (!meshRef.current || !positions) return;
+    if (!meshRef.current) return;
     meshRef.current.rotation.y += 0.0003;
     meshRef.current.rotation.x += 0.0001;
     const posArray = meshRef.current.geometry.attributes.position

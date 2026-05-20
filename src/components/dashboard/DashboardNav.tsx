@@ -126,7 +126,7 @@ export function DashboardNav({ alertCount = 0 }: { alertCount?: number }) {
       )}
 
       {/* Sidebar */}
-      <aside
+      <nav
         className={`fixed lg:static inset-y-0 left-0 z-50 ${sidebarWidth} border-r-[3px] border-gray-900 bg-white flex flex-col shadow-[4px_0_0_0_rgba(0,0,0,0.1)] transition-all duration-200 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
@@ -208,7 +208,7 @@ export function DashboardNav({ alertCount = 0 }: { alertCount?: number }) {
             </button>
           </form>
         </div>
-      </aside>
+      </nav>
 
       {/* Spacer for mobile when sidebar is open */}
       <div className="lg:hidden w-0" />

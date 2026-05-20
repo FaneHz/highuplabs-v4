@@ -4,14 +4,14 @@ import { useTranslations } from "@/lib/i18n-context";
 
 export default function CookiesContent() {
   const t = useTranslations("cookies");
-  const whatAre = t("whatAre") as { title: string; content: string };
-  const categories = t("categories") as {
+  const whatAre = t.raw("whatAre") as unknown as { title: string; content: string };
+  const categories = t.raw("categories") as unknown as {
     title: string;
     essential: { label: string; badge: string; content: string };
     analytics: { label: string; content: string };
     marketing: { label: string; content: string };
   };
-  const manage = t("manage") as { title: string; content: string };
+  const manage = t.raw("manage") as unknown as { title: string; content: string };
 
   return (
     <div className="min-h-screen bg-black pt-32 pb-24">

@@ -5,7 +5,7 @@ import { useTranslations } from "@/lib/i18n-context";
 export default function TermsContent() {
   const t = useTranslations("terms");
 
-  const sections = t("sections") as Array<{ title: string; content: string }>;
+  const sections = t.raw("sections") as unknown as Array<{ num: string; title: string; content: string }>;
 
   return (
     <div className="min-h-screen bg-black pt-32 pb-24">
@@ -23,7 +23,7 @@ export default function TermsContent() {
         </div>
 
         <div className="space-y-0 border border-[#1A1A1A]">
-          {sections.map((s: any) => (
+          {sections.map((s: { num: string; title: string; content: string }) => (
             <div key={s.num} className="p-8 md:p-12 border-b border-[#1A1A1A] last:border-b-0">
               <div className="flex items-start gap-6">
                 <span className="text-[10px] font-mono text-[#CCFF00] flex-shrink-0 mt-1">{s.num}</span>

@@ -1,3 +1,6 @@
+// DEAD CODE — calculator uses Supabase Edge Function directly (send-offer-email).
+// This route is never called. Delete if not needed.
+
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";

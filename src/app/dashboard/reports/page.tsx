@@ -7,15 +7,15 @@ export default async function ReportsRoute() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
-
   const { data: client } = await supabase
     .from("clients")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
+
+  if (!client) {
+    redirect("/dashboard/onboarding");
+  }
 
   const { data: reports } = await supabase
     .from("reports")

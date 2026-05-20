@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n-context";
 
@@ -14,7 +13,7 @@ export default function CTAFinal() {
           {Array.from({ length: 8 }).map((_, i) => (
             <span key={i} className="mx-8 text-[10px] font-mono text-[#333333] uppercase tracking-[0.3em]">
               PLATESTI CAND VINZI. SCALAM PROFITUL, NU RETAINERUL. GARANTIE 90 ZILE. CONTURILE TALE.
-              <span className="mx-8 text-[#CCFF00]">//</span>
+              <span className="mx-8 text-[#CCFF00]">{"//"}</span>
             </span>
           ))}
         </div>

@@ -31,7 +31,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     return () => {
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf as any);
+      gsap.ticker.remove(lenis.raf as (...args: unknown[]) => void);
     };
   }, []);
 

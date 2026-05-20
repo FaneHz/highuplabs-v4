@@ -1,16 +1,7 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
 import { ContentGenerator } from "@/components/dashboard/ContentGenerator";
 import { ErrorBoundary } from "@/components/dashboard/ErrorBoundary";
 
 export default async function ContentPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
   return (
     <div className="p-8">
       <div className="mb-8">

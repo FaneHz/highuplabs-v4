@@ -18,6 +18,11 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient();
+      if (!supabase) {
+        setError("Supabase nu este configurat. Contactează echipa tehnică.");
+        setLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,

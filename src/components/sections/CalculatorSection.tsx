@@ -177,6 +177,9 @@ export default function CalculatorSection() {
         scrollTrigger: { trigger: section, start: "top 60%" },
       }
     );
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   }, []);
 
   return (
