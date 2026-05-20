@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Locale } from "@/lib/i18n";
 import { useTranslations } from "@/lib/i18n-context";
+import { useAppConfig } from "@/lib/use-app-config";
 
 interface Consent {
   essential: boolean;
@@ -12,8 +13,6 @@ interface Consent {
 }
 
 const STORAGE_KEY = "hul-consent-v4";
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX";
-const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || "358583203608980";
 
 function loadConsent(): Consent | null {
   if (typeof window === "undefined") return null;
@@ -29,8 +28,8 @@ function saveConsent(consent: Consent) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
 }
 
-function injectPixel(allowed: boolean) {
-  if (!allowed || typeof window === "undefined") return;
+function injectPixel(allowed: boolean, pixelId: string) {
+  if (!allowed || typeof window === "undefined" || !pixelId || pixelId === "G-XXXXXXXXXX") return;
   if (document.getElementById("meta-pixel")) return;
   const script = document.createElement("script");
   script.id = "meta-pixel";
@@ -43,23 +42,23 @@ function injectPixel(allowed: boolean) {
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window,document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','${META_PIXEL_ID}');
+    fbq('init','${pixelId}');
     fbq('track','PageView');
   `;
   document.head.appendChild(script);
   const noscript = document.createElement("noscript");
-  noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1" />';
+  noscript.innerHTML = '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1" />';
   document.body.appendChild(noscript);
 }
 
-function injectGA4(allowed: boolean) {
-  if (!allowed || typeof window === "undefined") return;
+function injectGA4(allowed: boolean, gaId: string) {
+  if (!allowed || typeof window === "undefined" || !gaId || gaId === "G-XXXXXXXXXX") return;
   if (document.getElementById("ga4-script")) return;
   
   const script = document.createElement("script");
   script.id = "ga4-script";
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
   document.head.appendChild(script);
   
   const initScript = document.createElement("script");
@@ -68,13 +67,16 @@ function injectGA4(allowed: boolean) {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${GA_ID}', { 'anonymize_ip': true });
+    gtag('config', '${gaId}', { 'anonymize_ip': true });
   `;
   document.head.appendChild(initScript);
 }
 
 export default function CookieBanner({ locale }: { locale: Locale }) {
   const t = useTranslations("cookieBanner");
+  const { config } = useAppConfig();
+  const metaPixelId = config.meta_pixel_id || process.env.NEXT_PUBLIC_META_PIXEL_ID || "";
+  const gaId = config.ga_id || process.env.NEXT_PUBLIC_GA_ID || "";
   const [visible, setVisible] = useState(false);
   const [customize, setCustomize] = useState(false);
   const [consent, setConsent] = useState<Consent>({
@@ -89,24 +91,24 @@ export default function CookieBanner({ locale }: { locale: Locale }) {
       setVisible(true);
     } else {
       setConsent(saved);
-      injectPixel(saved.marketing);
-      injectGA4(saved.analytics);
+      injectPixel(saved.marketing, metaPixelId);
+      injectGA4(saved.analytics, gaId);
     }
-  }, []);
+  }, [metaPixelId, gaId]);
 
   function acceptAll() {
     const all = { essential: true, analytics: true, marketing: true };
     setConsent(all);
     saveConsent(all);
-    injectPixel(true);
-    injectGA4(true);
+    injectPixel(true, metaPixelId);
+    injectGA4(true, gaId);
     setVisible(false);
   }
 
   function acceptSelected() {
     saveConsent(consent);
-    injectPixel(consent.marketing);
-    injectGA4(consent.analytics);
+    injectPixel(consent.marketing, metaPixelId);
+    injectGA4(consent.analytics, gaId);
     setVisible(false);
   }
 
@@ -120,8 +122,8 @@ export default function CookieBanner({ locale }: { locale: Locale }) {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9998] bg-[#0A0A0A] border-t-2 border-[#CCFF00]">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-6">
+    <div className="fixed bottom-0 left-0 right-0 z-[9998] bg-[#0A0A0A] border-t-2 border-[#CCFF00] pointer-events-none">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-6 pointer-events-auto">
         <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
           <div className="flex-1">
             <h3 className="text-xs font-mono font-bold text-[#CCFF00] uppercase tracking-[0.2em] mb-2">

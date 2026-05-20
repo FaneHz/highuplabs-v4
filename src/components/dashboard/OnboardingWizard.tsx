@@ -9,7 +9,7 @@ import { updateClientSettings } from "@/lib/actions/settings";
 interface OnboardingWizardProps {
   clientId: string;
   metaOAuthUrl: string;
-  onComplete: () => void;
+  onComplete?: () => void;
 }
 
 export function OnboardingWizard({ clientId, metaOAuthUrl, onComplete }: OnboardingWizardProps) {
@@ -71,7 +71,7 @@ export function OnboardingWizard({ clientId, metaOAuthUrl, onComplete }: Onboard
     if (step < steps.length - 1) {
       setStep(step + 1);
     } else {
-      onComplete();
+      if (onComplete) onComplete();
     }
   };
 
@@ -216,7 +216,7 @@ export function OnboardingWizard({ clientId, metaOAuthUrl, onComplete }: Onboard
               </p>
             </div>
             <button
-              onClick={onComplete}
+              onClick={() => onComplete?.()}
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
             >
               <BarChart3 className="w-4 h-4" />

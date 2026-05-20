@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
+import { getAppConfig, getAppConfigNumber } from "@/lib/app-config";
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -31,15 +32,20 @@ const applicationSchema = z.object({
 });
 
 const ipRequests = new Map<string, number[]>();
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
-const RATE_LIMIT_MAX = 5;
 
-function isRateLimited(ip: string): boolean {
+async function getRateLimitConfig() {
+  const window = await getAppConfigNumber("rate_limit_window_ms", 60 * 60 * 1000);
+  const max = await getAppConfigNumber("rate_limit_max", 5);
+  return { window, max };
+}
+
+async function isRateLimited(ip: string): Promise<boolean> {
+  const { window, max } = await getRateLimitConfig();
   const now = Date.now();
   const requests = ipRequests.get(ip) || [];
-  const recentRequests = requests.filter((time) => now - time < RATE_LIMIT_WINDOW);
+  const recentRequests = requests.filter((time) => now - time < window);
 
-  if (recentRequests.length >= RATE_LIMIT_MAX) {
+  if (recentRequests.length >= max) {
     return true;
   }
 
@@ -53,7 +59,7 @@ export async function POST(request: NextRequest) {
     const forwardedFor = request.headers.get("x-forwarded-for");
     const ip = forwardedFor?.split(",")[0] || "unknown";
 
-    if (isRateLimited(ip)) {
+    if (await isRateLimited(ip)) {
       return NextResponse.json(
         { error: "Prea multe cereri. Încearcă mai târziu." },
         { status: 429 }
@@ -115,9 +121,11 @@ export async function POST(request: NextRequest) {
     try {
       const resend = getResend();
       if (resend) {
+        const fromEmail = await getAppConfig("email_from") || "High-Up Labs <noreply@highuplabs.ro>";
+        const toEmail = await getAppConfig("email_to") || "business@highuplabs.ro";
         await resend.emails.send({
-          from: "High-Up Labs <noreply@highuplabs.ro>",
-          to: "business@highuplabs.ro",
+          from: fromEmail,
+          to: toEmail,
           subject: `Aplicație nouă: ${data.name}`,
           html: `
             <h2>Aplicație nouă primită</h2>

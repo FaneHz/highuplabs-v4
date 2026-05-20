@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { getAppConfig } from "@/lib/app-config";
 
 const notifySchema = z.object({
   type: z.enum(["offer_accepted", "offer_rejected", "contract_requested"]),
@@ -107,9 +108,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid notification type" }, { status: 400 });
     }
 
+    const fromEmail = await getAppConfig("email_from") || "HighUpLabs <noreply@highuplabs.ro>";
+    const toEmail = await getAppConfig("email_to") || "business@highuplabs.ro";
+    
     await resend.emails.send({
-      from: "HighUpLabs <noreply@highuplabs.ro>",
-      to: "business@highuplabs.ro",
+      from: fromEmail,
+      to: toEmail,
       subject,
       html,
     });

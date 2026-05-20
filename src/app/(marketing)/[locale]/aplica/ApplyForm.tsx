@@ -41,6 +41,7 @@ export default function ApplyPage() {
   const methods = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onBlur",
+    shouldUnregister: false,
     defaultValues: {
       name: "",
       email: "",

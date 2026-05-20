@@ -25,6 +25,7 @@ import {
   Info
 } from "lucide-react";
 import { createClient } from "@/lib/supabase-client";
+import { useAppConfig } from "@/lib/use-app-config";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,16 +54,23 @@ interface OfferResult {
   disqualifyReason: string;
 }
 
-const DEFAULT_INPUTS: CalculatorInputs = {
-  monthlyRevenue: 15000,
-  marginPercent: 25,
-  currentAdSpend: 2000,
-  targetRoas: 4,
-  email: "",
-  fullName: "",
-  companyName: "",
-  phone: "",
-};
+function useCalculatorDefaults(config: Record<string, string>) {
+  return {
+    monthlyRevenue: Number(config.default_monthly_revenue) || 15000,
+    marginPercent: Number(config.default_margin_percent) || 25,
+    currentAdSpend: Number(config.default_ad_spend) || 2000,
+    targetRoas: Number(config.default_target_roas) || 4,
+  };
+}
+
+function useQualificationConfig(config: Record<string, string>) {
+  return {
+    minRevenue: Number(config.qualify_min_revenue) || 10000,
+    minMargin: Number(config.qualify_min_margin) || 15,
+    minAdSpend: Number(config.qualify_min_adspend) || 1000,
+    commissionPercent: Number(config.commission_percent) || 5,
+  };
+}
 
 function CustomSlider({
   label,
@@ -189,20 +197,23 @@ function AnimatedNumber({ value, prefix = "", suffix = "", className = "" }: {
   );
 }
 
-function calculateOffer(inputs: CalculatorInputs): OfferResult {
+function calculateOffer(
+  inputs: CalculatorInputs,
+  qualConfig: ReturnType<typeof useQualificationConfig>
+): OfferResult {
   const { monthlyRevenue, marginPercent, currentAdSpend, targetRoas } = inputs;
   
   // Calificare minimă
-  const qualifies = monthlyRevenue >= 10000 && marginPercent >= 15 && currentAdSpend >= 1000;
+  const qualifies = monthlyRevenue >= qualConfig.minRevenue && marginPercent >= qualConfig.minMargin && currentAdSpend >= qualConfig.minAdSpend;
   
   let disqualifyReason = "";
-  if (monthlyRevenue < 10000) disqualifyReason = "Venitul lunar minim pentru colaborare este de 10.000 EUR.";
-  else if (marginPercent < 15) disqualifyReason = "Marja minimă necesară este de 15%.";
-  else if (currentAdSpend < 1000) disqualifyReason = "Bugetul minim de reclame este de 1.000 EUR/lună.";
+  if (monthlyRevenue < qualConfig.minRevenue) disqualifyReason = `Venitul lunar minim pentru colaborare este de ${qualConfig.minRevenue.toLocaleString()} EUR.`;
+  else if (marginPercent < qualConfig.minMargin) disqualifyReason = `Marja minimă necesară este de ${qualConfig.minMargin}%.`;
+  else if (currentAdSpend < qualConfig.minAdSpend) disqualifyReason = `Bugetul minim de reclame este de ${qualConfig.minAdSpend.toLocaleString()} EUR/lună.`;
   
   // Calcule
   const netProfitBeforeAds = monthlyRevenue * (marginPercent / 100);
-  const commissionPercent = 5;
+  const commissionPercent = qualConfig.commissionPercent;
   
   // Buget recomandat = venituri / ROAS target
   const recommendedBudget = Math.max(currentAdSpend, Math.round(monthlyRevenue / targetRoas));
@@ -237,15 +248,19 @@ function calculateOffer(inputs: CalculatorInputs): OfferResult {
 export default function OfferCalculator() {
   const sectionRef = useRef<HTMLElement>(null);
   const searchParams = useSearchParams();
+  const { config } = useAppConfig();
+  const defaults = useCalculatorDefaults(config);
+  const qualConfig = useQualificationConfig(config);
+  
   const [inputs, setInputs] = useState<CalculatorInputs>({
-    monthlyRevenue: Number(searchParams.get("sales")) || DEFAULT_INPUTS.monthlyRevenue,
-    marginPercent: Number(searchParams.get("margin")) || DEFAULT_INPUTS.marginPercent,
-    currentAdSpend: Number(searchParams.get("budget")) || DEFAULT_INPUTS.currentAdSpend,
-    targetRoas: DEFAULT_INPUTS.targetRoas,
-    email: DEFAULT_INPUTS.email,
-    fullName: DEFAULT_INPUTS.fullName,
-    companyName: DEFAULT_INPUTS.companyName,
-    phone: DEFAULT_INPUTS.phone,
+    monthlyRevenue: Number(searchParams.get("sales")) || defaults.monthlyRevenue,
+    marginPercent: Number(searchParams.get("margin")) || defaults.marginPercent,
+    currentAdSpend: Number(searchParams.get("budget")) || defaults.currentAdSpend,
+    targetRoas: defaults.targetRoas,
+    email: "",
+    fullName: "",
+    companyName: "",
+    phone: "",
   });
   const hasQueryParams = searchParams.has("sales") || searchParams.has("margin") || searchParams.has("budget");
   const [step, setStep] = useState<"calculator" | "contact" | "result" | "contract">(hasQueryParams ? "contact" : "calculator");
@@ -256,7 +271,12 @@ export default function OfferCalculator() {
 
   const supabase = useMemo(() => {
     if (typeof window !== "undefined") {
-      return createClient();
+      try {
+        return createClient();
+      } catch (e) {
+        console.error("Supabase init failed:", e);
+        return null;
+      }
     }
     return null;
   }, []);
@@ -278,7 +298,7 @@ export default function OfferCalculator() {
   }, []);
 
   const handleCalculate = () => {
-    const result = calculateOffer(inputs);
+    const result = calculateOffer(inputs, qualConfig);
     setOffer(result);
     setStep("contact");
   };
@@ -304,7 +324,7 @@ export default function OfferCalculator() {
     setError("");
     
     try {
-      if (!supabase) throw new Error("Client Supabase indisponibil");
+      if (!supabase) throw new Error("Client Supabase indisponibil. Reîncarcă pagina.");
       // 1. Salvează mai întâi în Supabase
       const { error: dbError } = await supabase
         .from("offers")
@@ -332,24 +352,29 @@ export default function OfferCalculator() {
       
       // 3. Trimite email best-effort (nu blocking)
       try {
-        const emailResponse = await fetch("/api/oferta/notify", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: "offer_accepted",
-            email: inputs.email,
-            fullName: inputs.fullName,
-            companyName: inputs.companyName,
-            phone: inputs.phone,
-            monthlyRevenue: inputs.monthlyRevenue,
-            marginPercent: inputs.marginPercent,
-            recommendedBudget: offer?.recommendedBudget,
-            estimatedProfit: offer?.estimatedProfit,
-            commissionPercent: offer?.commissionPercent,
-          }),
-        });
+        const functionsUrl = config.supabase_functions_url || "https://qpuswbcxegxvgjbwinrq.supabase.co/functions/v1";
+        const emailResponse = await fetch(
+          `${functionsUrl}/send-offer-email`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+              type: "offer_accepted",
+              email: inputs.email,
+              fullName: inputs.fullName,
+              companyName: inputs.companyName,
+              phone: inputs.phone,
+              monthlyRevenue: inputs.monthlyRevenue,
+              marginPercent: inputs.marginPercent,
+              recommendedBudget: offer?.recommendedBudget,
+              estimatedProfit: offer?.estimatedProfit,
+              commissionPercent: offer?.commissionPercent,
+            }),
+          }
+        );
 
         if (!emailResponse.ok) {
           const emailData = await emailResponse.json().catch(() => ({}));
@@ -360,6 +385,7 @@ export default function OfferCalculator() {
       }
     } catch (err: any) {
       setError(err.message || "A apărut o eroare. Te rugăm să încerci din nou.");
+      console.error("handleAcceptOffer error:", err);
     } finally {
       setLoading(false);
     }
@@ -367,10 +393,11 @@ export default function OfferCalculator() {
 
   const handleRejectOffer = async () => {
     setLoading(true);
-    
+    setError("");
+
     try {
-      if (!supabase) throw new Error("Client Supabase indisponibil");
-      await supabase
+      if (!supabase) throw new Error("Client Supabase indisponibil. Reîncarcă pagina.");
+      const { error: dbError } = await supabase
         .from("offers")
         .insert({
           email: inputs.email,
@@ -388,29 +415,36 @@ export default function OfferCalculator() {
           poas_estimate: offer?.poasEstimate,
           status: "rejected",
         });
-      
+
+      if (dbError) throw dbError;
+
       setSuccess("Am înregistrat feedback-ul tău. Dacă îți schimbi părerea, ne poți contacta oricând.");
-      
+
       // Trimite notificare best-effort (nu blocking)
       try {
-        const emailResponse = await fetch("/api/oferta/notify", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: "offer_rejected",
-            email: inputs.email,
-            fullName: inputs.fullName,
-            companyName: inputs.companyName,
-            phone: inputs.phone,
-            monthlyRevenue: inputs.monthlyRevenue,
-            marginPercent: inputs.marginPercent,
-            recommendedBudget: offer?.recommendedBudget,
-            estimatedProfit: offer?.estimatedProfit,
-            commissionPercent: offer?.commissionPercent,
-          }),
-        });
+        const functionsUrl = config.supabase_functions_url || "https://qpuswbcxegxvgjbwinrq.supabase.co/functions/v1";
+        const emailResponse = await fetch(
+          "https://qpuswbcxegxvgjbwinrq.supabase.co/functions/v1/send-offer-email",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+              type: "offer_rejected",
+              email: inputs.email,
+              fullName: inputs.fullName,
+              companyName: inputs.companyName,
+              phone: inputs.phone,
+              monthlyRevenue: inputs.monthlyRevenue,
+              marginPercent: inputs.marginPercent,
+              recommendedBudget: offer?.recommendedBudget,
+              estimatedProfit: offer?.estimatedProfit,
+              commissionPercent: offer?.commissionPercent,
+            }),
+          }
+        );
 
         if (!emailResponse.ok) {
           const emailData = await emailResponse.json().catch(() => ({}));
@@ -420,7 +454,8 @@ export default function OfferCalculator() {
         console.error("Email notification failed:", emailErr);
       }
     } catch (err: any) {
-      setError(err.message || "A apărut o eroare.");
+      setError(err.message || "A apărut o eroare. Te rugăm să încerci din nou.");
+      console.error("handleRejectOffer error:", err);
     } finally {
       setLoading(false);
     }
@@ -436,7 +471,7 @@ export default function OfferCalculator() {
     setError("");
     
     try {
-      if (!supabase) throw new Error("Client Supabase indisponibil");
+      if (!supabase) throw new Error("Client Supabase indisponibil. Reîncarcă pagina.");
       const formData = new FormData(e.target as HTMLFormElement);
       
       // 1. Salvează mai întâi în Supabase
@@ -470,25 +505,30 @@ export default function OfferCalculator() {
       
       // 3. Trimite email best-effort (nu blocking)
       try {
-        const emailResponse = await fetch("/api/oferta/notify", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: "contract_requested",
-            email: inputs.email,
-            fullName: inputs.fullName,
-            companyName: inputs.companyName,
-            phone: inputs.phone,
-            monthlyRevenue: inputs.monthlyRevenue,
-            marginPercent: inputs.marginPercent,
-            recommendedBudget: offer?.recommendedBudget,
-            estimatedProfit: offer?.estimatedProfit,
-            commissionPercent: offer?.commissionPercent,
-            status: "contract_requested",
-          }),
-        });
+        const functionsUrl = config.supabase_functions_url || "https://qpuswbcxegxvgjbwinrq.supabase.co/functions/v1";
+        const emailResponse = await fetch(
+          `${functionsUrl}/send-offer-email`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({
+              type: "contract_requested",
+              email: inputs.email,
+              fullName: inputs.fullName,
+              companyName: inputs.companyName,
+              phone: inputs.phone,
+              monthlyRevenue: inputs.monthlyRevenue,
+              marginPercent: inputs.marginPercent,
+              recommendedBudget: offer?.recommendedBudget,
+              estimatedProfit: offer?.estimatedProfit,
+              commissionPercent: offer?.commissionPercent,
+              status: "contract_requested",
+            }),
+          }
+        );
 
         if (!emailResponse.ok) {
           const emailData = await emailResponse.json().catch(() => ({}));
@@ -499,6 +539,7 @@ export default function OfferCalculator() {
       }
     } catch (err: any) {
       setError(err.message || "A apărut o eroare. Te rugăm să încerci din nou.");
+      console.error("handleContractSubmit error:", err);
     } finally {
       setLoading(false);
     }
@@ -614,9 +655,9 @@ export default function OfferCalculator() {
                         Minim pentru colaborare:
                       </p>
                       <ul className="text-xs font-mono text-[#666] space-y-1">
-                        <li>• Venituri: 10.000+ EUR/lună</li>
-                        <li>• Marjă: 15%+</li>
-                        <li>• Buget ads: 1.000+ EUR/lună</li>
+                        <li>• Venituri: {qualConfig.minRevenue.toLocaleString()}+ EUR/lună</li>
+                        <li>• Marjă: {qualConfig.minMargin}%+</li>
+                        <li>• Buget ads: {qualConfig.minAdSpend.toLocaleString()}+ EUR/lună</li>
                       </ul>
                     </div>
                   </div>
@@ -646,9 +687,9 @@ export default function OfferCalculator() {
                     />
                   </div>
                   <div className="flex justify-between items-end border-b border-[#1A1A1A] pb-4">
-                    <span className="text-sm text-[#A3A3A3]">Comision HUL (5%)</span>
+                    <span className="text-sm text-[#A3A3A3]">Comision HUL ({qualConfig.commissionPercent}%)</span>
                     <AnimatedNumber 
-                      value={Math.round(inputs.monthlyRevenue * 0.05)} 
+                      value={Math.round(inputs.monthlyRevenue * (qualConfig.commissionPercent / 100))} 
                       prefix="€" 
                       className="text-2xl font-black text-[#CCFF00]" 
                     />
@@ -657,12 +698,12 @@ export default function OfferCalculator() {
                     <div className="flex justify-between items-end mb-2">
                       <span className="text-sm font-bold text-white">Profit net estimat</span>
                       <span className={`text-4xl font-black ${
-                        (inputs.monthlyRevenue * (inputs.marginPercent / 100) - Math.max(inputs.currentAdSpend, Math.round(inputs.monthlyRevenue / inputs.targetRoas)) - inputs.monthlyRevenue * 0.05) >= 0 
+                        (inputs.monthlyRevenue * (inputs.marginPercent / 100) - Math.max(inputs.currentAdSpend, Math.round(inputs.monthlyRevenue / inputs.targetRoas)) - inputs.monthlyRevenue * (qualConfig.commissionPercent / 100)) >= 0 
                           ? "text-[#CCFF00]" 
                           : "text-[#FF3333]"
                       }`}>
                         <AnimatedNumber 
-                          value={Math.round(inputs.monthlyRevenue * (inputs.marginPercent / 100) - Math.max(inputs.currentAdSpend, Math.round(inputs.monthlyRevenue / inputs.targetRoas)) - inputs.monthlyRevenue * 0.05)} 
+                          value={Math.round(inputs.monthlyRevenue * (inputs.marginPercent / 100) - Math.max(inputs.currentAdSpend, Math.round(inputs.monthlyRevenue / inputs.targetRoas)) - inputs.monthlyRevenue * (qualConfig.commissionPercent / 100))} 
                           prefix="€" 
                         />
                       </span>
@@ -882,7 +923,7 @@ export default function OfferCalculator() {
                         <ul className="space-y-2 text-xs font-mono text-[#999]">
                           <li className="flex items-start gap-2">
                             <Check className="w-3 h-3 text-[#CCFF00] mt-0.5 shrink-0" />
-                            Comision 5% din veniturile generate de reclame
+                            Comision {qualConfig.commissionPercent}% din veniturile generate de reclame
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-3 h-3 text-[#CCFF00] mt-0.5 shrink-0" />
@@ -987,10 +1028,10 @@ export default function OfferCalculator() {
 
                   <div className="border border-[#1A1A1A] p-6 bg-[#111]">
                     <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
-                      De ce 5%?
+                      De ce {qualConfig.commissionPercent}%?
                     </h3>
                     <p className="text-xs font-mono text-[#999] leading-relaxed">
-                      Startul e la 5% pentru a-ți demonstra valoarea fără riscuri. 
+                      Startul e la {qualConfig.commissionPercent}% pentru a-ți demonstra valoarea fără riscuri. 
                       Pe măsură ce scalăm și creștem ROAS, comisionul poate ajunge la 7-10%, 
                       dar doar dacă rezultatele sunt consistente.
                     </p>
