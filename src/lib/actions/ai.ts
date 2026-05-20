@@ -209,30 +209,99 @@ Fă postările engaging, cu CTA clar, adaptate tonei și platformei.`;
   }
 }
 
+export interface MarginAnalysisResult {
+  profitability_score: number;
+  break_even_analysis: string;
+  recommendations: Array<{
+    priority: 'high' | 'medium' | 'low';
+    action: string;
+    impact: string;
+    estimated_value: string;
+  }>;
+  risks: Array<{
+    severity: 'high' | 'medium' | 'low';
+    description: string;
+    mitigation: string;
+  }>;
+  scaling_opportunities: string[];
+}
+
+const marginAnalysisResultSchema = z.object({
+  profitability_score: z.number().min(0).max(100),
+  break_even_analysis: z.string(),
+  recommendations: z.array(z.object({
+    priority: z.enum(['high', 'medium', 'low']),
+    action: z.string(),
+    impact: z.string(),
+    estimated_value: z.string(),
+  })),
+  risks: z.array(z.object({
+    severity: z.enum(['high', 'medium', 'low']),
+    description: z.string(),
+    mitigation: z.string(),
+  })),
+  scaling_opportunities: z.array(z.string()),
+});
+
 export async function analyzeMargins(data: { inputs: unknown; metaContext?: unknown }) {
   const user = await ensureAuth();
   const parsed = analyzeMarginsSchema.parse(data);
 
   await logAction('ai_margins_analyze', { user_id: user.id });
 
-  const systemPrompt = `Ești un consultant financiar pentru e-commerce și servicii. Analizează datele financiare primite și oferă insights structurate în JSON cu cheile:
-"margin_analysis", "break_even", "scalability_score", "recommendations", "risks".
-Răspunde STRICT în JSON valid, fără markdown, fără text adițional.`;
+  const systemPrompt = `Ești un expert financiar pentru e-commerce cu 15 ani experiență în analiza profitabilității business-urilor online.
+
+TASK: Analizează datele financiare primite și oferă un audit complet al profitabilității în format JSON strict.
+
+STRUCTURĂ OBLIGATORIE:
+{
+  "profitability_score": number (0-100),
+  "break_even_analysis": "string - analiză detaliată break-even în română",
+  "recommendations": [
+    {
+      "priority": "high|medium|low",
+      "action": "string - acțiune concretă și specifică",
+      "impact": "string - impact estimat asupra business-ului",
+      "estimated_value": "string - valoare estimată în EUR sau procent"
+    }
+  ],
+  "risks": [
+    {
+      "severity": "high|medium|low",
+      "description": "string - descriere clară a riscului",
+      "mitigation": "string - strategie de mitigare concretă"
+    }
+  ],
+  "scaling_opportunities": ["string - oportunități de scalare"]
+}
+
+INSTRUCȚIUNI:
+- Scorul de profitabilitate (0-100) bazat pe: marja netă, raportul break-even/revenue, eficiența ad spend, structura costurilor
+- Break-even: calculează cât trebuie să vândă lunar pentru a acoperi toate costurile, cât de aproape e de veniturile actuale
+- Recomandări: maxim 5, prioritizate, cu acțiuni concrete și valori estimate
+- Riscuri: identifică riscurile reale din date (dependență de ads, marjă mică, costuri fixe mari, etc.)
+- Oportunități: sugerează canale de scalare sau optimizări
+- Răspunde ÎN ROMÂNĂ, folosește termeni de business clari
+- Fii direct, fără bullshit, acționabil
+- Răspunde STRICT în JSON valid, fără markdown, fără text adițional`;
 
   try {
     const result = await chatCompletion({
       model: 'openrouter/free',
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Inputs: ${JSON.stringify(parsed.inputs)}\nMeta: ${parsed.metaContext ? JSON.stringify(parsed.metaContext) : 'N/A'}` },
+        { role: 'user', content: `Date financiare: ${JSON.stringify(parsed.inputs)}\nContext suplimentar: ${parsed.metaContext ? JSON.stringify(parsed.metaContext) : 'N/A'}` },
       ],
-      temperature: 0.5,
-      max_tokens: 2048,
+      temperature: 0.4,
+      max_tokens: 2500,
       response_format: { type: 'json_object' },
     });
 
+    const extracted = extractJsonFromCompletion(result);
+    const validated = marginAnalysisResultSchema.parse(extracted);
+
     await logAction('ai_margins_success', { user_id: user.id });
-    return result;
+    return validated;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     await logAction('ai_margins_error', { user_id: user.id, error: message });

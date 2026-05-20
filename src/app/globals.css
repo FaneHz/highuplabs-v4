@@ -7,10 +7,16 @@
   --color-lime: #CCFF00;
   --color-lime-dim: #99CC00;
   --color-lime-glow: rgba(204, 255, 0, 0.15);
+  --color-lime-dark: #99CC00;
   --color-white: #FFFFFF;
   --color-muted: #666666;
   --color-grid: #1A1A1A;
   --color-warning: #FF3333;
+  --color-red: #EF3E36;
+  --color-ink: #0A0A0A;
+  --color-card: #FFFFFF;
+  --color-bg: #F9F9F7;
+  --color-bg-alt: #F1EFE8;
 
   --font-display: var(--font-inter), system-ui, sans-serif;
   --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
@@ -78,6 +84,80 @@ body {
 .border-lime { border-color: #CCFF00; }
 .bg-lime { background-color: #CCFF00; }
 .text-lime { color: #CCFF00; }
+
+/* Brutalist card component */
+.brutal-card {
+  background: var(--color-card);
+  border: 3px solid var(--color-ink);
+  box-shadow: 4px 4px 0 0 var(--color-ink);
+}
+
+/* Brutalist button */
+.btn-brutal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-ink);
+  color: var(--color-white);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--color-ink);
+  box-shadow: 3px 3px 0 0 var(--color-ink);
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+}
+.btn-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 0 var(--color-ink);
+}
+.btn-brutal:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 0 var(--color-ink);
+}
+
+/* Brutalist ghost button */
+.btn-brutal-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--color-ink);
+  box-shadow: 3px 3px 0 0 var(--color-ink);
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+}
+.btn-brutal-ghost:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 0 var(--color-ink);
+}
+.btn-brutal-ghost:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 0 var(--color-ink);
+}
+
+/* Sticker badge */
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--color-ink);
+}
 
 /* Scan line effect */
 .scan-line {

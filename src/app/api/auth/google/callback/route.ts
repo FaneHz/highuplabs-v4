@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
+import { encryptToken } from "@/lib/meta-auth";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -90,12 +91,16 @@ export async function GET(request: NextRequest) {
         .eq("account_id", customerId)
         .limit(1);
 
+      // Encrypt tokens before storing (SECURITY: never store plaintext tokens)
+      const encryptedAccessToken = encryptToken(accessToken);
+      const encryptedRefreshToken = refreshToken ? encryptToken(refreshToken) : null;
+
       if (existing && existing.length > 0) {
         await supabase
           .from("client_platform_accounts")
           .update({
-            access_token_encrypted: accessToken, // Should be encrypted in production
-            refresh_token_encrypted: refreshToken || null,
+            access_token_encrypted: encryptedAccessToken,
+            refresh_token_encrypted: encryptedRefreshToken,
             token_expires_at: expiresAt,
             is_active: true,
           })
@@ -105,8 +110,8 @@ export async function GET(request: NextRequest) {
           client_id: user.id,
           platform: "google",
           account_id: customerId,
-          access_token_encrypted: accessToken, // Should be encrypted in production
-          refresh_token_encrypted: refreshToken || null,
+          access_token_encrypted: encryptedAccessToken,
+          refresh_token_encrypted: encryptedRefreshToken,
           token_expires_at: expiresAt,
           is_active: true,
         });

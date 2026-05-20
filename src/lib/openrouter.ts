@@ -1,5 +1,6 @@
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://highuplabs.ro';
+import { getSecretConfig, getPublicConfig } from './config';
+
+const FALLBACK_APP_URL = 'https://highuplabs.ro';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -16,6 +17,9 @@ export interface ChatCompletionOptions {
 }
 
 export async function chatCompletion(options: ChatCompletionOptions) {
+  const OPENROUTER_API_KEY = await getSecretConfig('OPENROUTER_API_KEY');
+  const APP_URL = (await getPublicConfig('NEXT_PUBLIC_APP_URL')) || FALLBACK_APP_URL;
+
   if (!OPENROUTER_API_KEY) {
     throw new Error('OPENROUTER_API_KEY is not defined');
   }
