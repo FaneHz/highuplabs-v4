@@ -25,7 +25,7 @@ export default async function CalculatorPage() {
     .eq("client_id", user.id)
     .eq("is_active", true);
 
-  const hasMeta = platforms?.some((p) => p.platform === "meta") ?? false;
+  const hasMeta = platforms?.some((p: { platform: string }) => p.platform === "meta") ?? false;
 
   let reportedRoas = 0;
 
