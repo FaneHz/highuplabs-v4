@@ -1,8 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslations } from "@/lib/i18n-context";
-import { ArrowRight, ArrowLeft, RotateCcw, Check, Lightbulb, Target, TrendingUp, AlertTriangle } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  RotateCcw,
+  Check,
+  Lightbulb,
+  Target,
+  TrendingUp,
+  AlertTriangle,
+  Sparkles,
+  Calculator,
+} from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -13,6 +24,16 @@ import {
   Tooltip,
   Cell,
 } from "recharts";
+import { AIAnalysisPanel } from "./AIAnalysisPanel";
+import { ScenarioComparison, type CalculatorScenario } from "./ScenarioComparison";
+import { InputTooltip, getValidationWarning } from "./CalculatorTooltip";
+import { analyzeMargins, type MarginAnalysisResult } from "@/lib/actions/ai";
+import {
+  getCalculatorScenarios,
+  saveCalculatorScenario,
+  deleteCalculatorScenario,
+  type CalculatorScenarioRecord,
+} from "@/lib/actions/calculator";
 
 interface CalculatorInputs {
   revenue: number;
@@ -308,6 +329,40 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
   });
   const [showResults, setShowResults] = useState(false);
   const [checkedActions, setCheckedActions] = useState<Set<string>>(new Set());
+  
+  // AI Analysis state
+  const [aiData, setAiData] = useState<MarginAnalysisResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  
+  // Scenarios state
+  const [scenarios, setScenarios] = useState<CalculatorScenario[]>([]);
+  const [compareScenarios, setCompareScenarios] = useState<CalculatorScenario[]>([]);
+  const [scenariosLoading, setScenariosLoading] = useState(false);
+
+  // Load scenarios from Supabase on mount
+  useEffect(() => {
+    async function load() {
+      setScenariosLoading(true);
+      try {
+        const data: CalculatorScenarioRecord[] = await getCalculatorScenarios();
+        setScenarios(
+          data.map((s) => ({
+            id: s.id,
+            name: s.name,
+            created_at: s.created_at,
+            inputs: s.inputs as CalculatorScenario["inputs"],
+            results: s.results as CalculatorScenario["results"],
+          }))
+        );
+      } catch {
+        // Silently fail - scenarios are non-critical
+      } finally {
+        setScenariosLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const results = useCalculatorResults(inputs);
   const currentStep = STEPS[step];
@@ -324,6 +379,12 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
   const recommendations = useMemo(() => generateRecommendations(inputs, results), [inputs, results]);
   const actionItems = useMemo(() => generateActionItems(inputs, results), [inputs, results]);
 
+  // Smart validation
+  const validationWarning = useMemo(() => {
+    if (!currentStep) return null;
+    return getValidationWarning(currentStep.key, inputs[currentStep.key as keyof CalculatorInputs], inputs);
+  }, [currentStep, inputs]);
+
   function updateValue(key: keyof CalculatorInputs, value: string) {
     const num = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
     setInputs((prev) => ({ ...prev, [key]: num }));
@@ -337,6 +398,81 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
       return next;
     });
   }
+
+  // AI Analysis handler
+  const handleAnalyze = useCallback(async () => {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const data = await analyzeMargins({
+        inputs: {
+          ...inputs,
+          ...results,
+          reportedRoas,
+          healthScore,
+        },
+        metaContext: {
+          industry: "e-commerce",
+          currency: "EUR",
+          analysis_type: "monthly",
+        },
+      });
+      setAiData(data);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "Eroare necunoscută");
+    } finally {
+      setAiLoading(false);
+    }
+  }, [inputs, results, reportedRoas, healthScore]);
+
+  // Scenario handlers
+  const handleSaveScenario = useCallback(async (name: string) => {
+    try {
+      const saved = await saveCalculatorScenario({
+        name,
+        inputs: { ...inputs },
+        results: { ...results },
+      });
+      const newScenario: CalculatorScenario = {
+        id: saved.id,
+        name: saved.name,
+        created_at: saved.created_at,
+        inputs: saved.inputs as CalculatorScenario["inputs"],
+        results: saved.results as CalculatorScenario["results"],
+      };
+      setScenarios((prev) => [newScenario, ...prev]);
+    } catch {
+      // Silently fail or could show toast
+    }
+  }, [inputs, results]);
+
+  const handleDeleteScenario = useCallback(async (id: string) => {
+    try {
+      await deleteCalculatorScenario(id);
+      setScenarios((prev) => prev.filter((s) => s.id !== id));
+      setCompareScenarios((prev) => prev.filter((s) => s.id !== id));
+    } catch {
+      // Silently fail
+    }
+  }, []);
+
+  const handleLoadScenario = useCallback((scenario: CalculatorScenario) => {
+    setInputs(scenario.inputs);
+    setShowResults(false);
+    setStep(0);
+    setAiData(null);
+  }, []);
+
+  const handleCompareScenario = useCallback((scenario: CalculatorScenario) => {
+    setCompareScenarios((prev) => {
+      if (prev.some((s) => s.id === scenario.id)) return prev;
+      return [...prev, scenario].slice(0, 2);
+    });
+  }, []);
+
+  const hasData = useMemo(() => {
+    return inputs.revenue > 0 && inputs.cogs >= 0 && inputs.adSpend >= 0;
+  }, [inputs]);
 
   const borderLeftColors: Record<string, string> = {
     danger: "border-l-[6px] border-l-[var(--color-red)]",
@@ -354,192 +490,228 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
 
   if (showResults) {
     return (
-      <div className="space-y-8 max-w-4xl">
-        <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl">{t("title")}</h1>
-          <button
-            onClick={() => setShowResults(false)}
-            className="btn-brutal-ghost text-xs hover:bg-[var(--color-ink)] hover:text-[var(--color-lime)] transition-colors"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Recalculează
-          </button>
-        </div>
-
-        {/* Health Score */}
-        <div className="brutal-card p-8 flex flex-col sm:flex-row items-center gap-8">
-          <CircularScore score={healthScore} label={t("healthScore")} />
-          <div className="flex-1 space-y-2 text-center sm:text-left">
-            <p className="font-heading font-bold text-lg">
-              {healthScore < 40 ? t("scorePoor") : healthScore <= 70 ? t("scoreAverage") : t("scoreGood")}
-            </p>
-            <p className="font-mono text-sm text-[var(--color-muted)]">
-              {t("scoreDescription")}
-            </p>
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <div className="flex items-center justify-between">
+            <h1 className="font-display text-3xl">{t("title")}</h1>
+            <button
+              onClick={() => {
+                setShowResults(false);
+                setAiData(null);
+              }}
+              className="btn-brutal-ghost text-xs hover:bg-[var(--color-ink)] hover:text-[var(--color-lime)] transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Recalculează
+            </button>
           </div>
-        </div>
 
-        {/* Main Result */}
-        <div className="brutal-card p-8 bg-[var(--color-lime)]">
-          <p className="font-mono text-sm uppercase tracking-wider mb-2">{t("resultEbitda")}</p>
-          <p className="font-mono text-5xl font-bold">
-            €{results.ebitda.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
-          </p>
-          <p className="font-heading font-semibold mt-2">
-            {t("resultMargin")}: {results.netMargin.toFixed(1)}%
-          </p>
-        </div>
+          {/* Health Score */}
+          <div className="brutal-card p-8 flex flex-col sm:flex-row items-center gap-8">
+            <CircularScore score={healthScore} label={t("healthScore")} />
+            <div className="flex-1 space-y-2 text-center sm:text-left">
+              <p className="font-heading font-bold text-lg">
+                {healthScore < 40 ? t("scorePoor") : healthScore <= 70 ? t("scoreAverage") : t("scoreGood")}
+              </p>
+              <p className="font-mono text-sm text-[var(--color-muted)]">
+                {t("scoreDescription")}
+              </p>
+            </div>
+          </div>
 
-        {/* Breakdown */}
-        <div className="grid md:grid-cols-3 gap-4">
-          <div className="brutal-card p-5">
-            <p className="text-xs font-mono uppercase text-[var(--color-muted)]">{t("grossProfit")}</p>
-            <p className="font-mono text-xl font-bold mt-1">
-              €{results.grossProfit.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
+          {/* Main Result */}
+          <div className="brutal-card p-8 bg-[var(--color-lime)]">
+            <p className="font-mono text-sm uppercase tracking-wider mb-2">{t("resultEbitda")}</p>
+            <p className="font-mono text-5xl font-bold">
+              €{results.ebitda.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
+            </p>
+            <p className="font-heading font-semibold mt-2">
+              {t("resultMargin")}: {results.netMargin.toFixed(1)}%
             </p>
           </div>
-          <div className="brutal-card p-5">
-            <p className="text-xs font-mono uppercase text-[var(--color-muted)]">{t("agencyFee")}</p>
-            <p className="font-mono text-xl font-bold mt-1">
-              €{results.agencyFee.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
-            </p>
-          </div>
-          <div className="brutal-card p-5">
-            <p className="text-xs font-mono uppercase text-[var(--color-muted)]">{t("resultBreakEven")}</p>
-            <p className="font-mono text-xl font-bold mt-1">
-              €{results.breakEvenRevenue.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
-            </p>
-          </div>
-        </div>
 
-        {/* Recommendations */}
-        <div className="brutal-card p-6">
-          <h2 className="font-heading font-bold text-lg mb-4 flex items-center gap-2">
-            <Lightbulb className="w-5 h-5" />
-            {t("recommendationsTitle")}
-          </h2>
-          <div className="space-y-3">
-            {recommendations.map((rec) => (
-              <div
-                key={rec.id}
-                className={`p-4 ${recBgColors[rec.type]} ${borderLeftColors[rec.type]} border-[3px] border-[var(--color-ink)] flex items-start gap-3`}
-              >
-                <span className="mt-0.5 shrink-0">{rec.icon}</span>
-                <p className="font-mono text-sm leading-relaxed">{rec.text}</p>
-              </div>
-            ))}
+          {/* Breakdown */}
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="brutal-card p-5">
+              <p className="text-xs font-mono uppercase text-[var(--color-muted)]">{t("grossProfit")}</p>
+              <p className="font-mono text-xl font-bold mt-1">
+                €{results.grossProfit.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
+              </p>
+            </div>
+            <div className="brutal-card p-5">
+              <p className="text-xs font-mono uppercase text-[var(--color-muted)]">{t("agencyFee")}</p>
+              <p className="font-mono text-xl font-bold mt-1">
+                €{results.agencyFee.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
+              </p>
+            </div>
+            <div className="brutal-card p-5">
+              <p className="text-xs font-mono uppercase text-[var(--color-muted)]">{t("resultBreakEven")}</p>
+              <p className="font-mono text-xl font-bold mt-1">
+                €{results.breakEvenRevenue.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Action Items */}
-        <div className="brutal-card p-6">
-          <h2 className="font-heading font-bold text-lg mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            {t("actionItemsTitle")}
-          </h2>
-          <div className="space-y-2">
-            {actionItems.map((item) => {
-              const checked = checkedActions.has(item.id);
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => toggleAction(item.id)}
-                  className={`w-full text-left p-3 border-[3px] border-[var(--color-ink)] flex items-center gap-3 transition-all ${
-                    checked ? "bg-[var(--color-lime)] opacity-70" : "bg-[var(--color-card)] hover:bg-[var(--color-bg-alt)]"
-                  }`}
+          {/* Recommendations */}
+          <div className="brutal-card p-6">
+            <h2 className="font-heading font-bold text-lg mb-4 flex items-center gap-2">
+              <Lightbulb className="w-5 h-5" />
+              {t("recommendationsTitle")}
+            </h2>
+            <div className="space-y-3">
+              {recommendations.map((rec) => (
+                <div
+                  key={rec.id}
+                  className={`p-4 ${recBgColors[rec.type]} ${borderLeftColors[rec.type]} border-[3px] border-[var(--color-ink)] flex items-start gap-3`}
                 >
-                  <span
-                    className={`w-5 h-5 border-[3px] border-[var(--color-ink)] flex items-center justify-center transition-colors ${
-                      checked ? "bg-[var(--color-ink)]" : "bg-white"
-                    }`}
-                  >
-                    {checked && <Check className="w-3 h-3 text-[var(--color-lime)]" />}
-                  </span>
-                  <span className={`font-mono text-sm flex-1 ${checked ? "line-through text-[var(--color-muted)]" : ""}`}>
-                    {item.label}
-                  </span>
-                  <span
-                    className={`sticker text-[10px] ${
-                      item.impact === "high"
-                        ? "bg-[var(--color-red)] text-white"
-                        : item.impact === "medium"
-                        ? "bg-[var(--color-lime)]"
-                        : "bg-[var(--color-bg-alt)]"
-                    }`}
-                  >
-                    {item.impact === "high" ? "HIGH" : item.impact === "medium" ? "MED" : "LOW"}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Benchmarks */}
-        <div className="brutal-card p-6">
-          <h2 className="font-heading font-bold text-lg mb-4">{t("benchmarksTitle")}</h2>
-          <BenchmarkChart
-            netMargin={results.netMargin}
-            adSpendRatio={inputs.revenue > 0 ? inputs.adSpend / inputs.revenue : 0}
-            roas={reportedRoas}
-          />
-          <p className="font-mono text-xs text-[var(--color-muted)] mt-3">
-            {t("benchmarksLegend")}
-          </p>
-        </div>
-
-        {/* Scenarios */}
-        <div className="brutal-card p-6">
-          <h2 className="font-heading font-bold text-lg mb-4">{t("scenarioTitle")}</h2>
-          <div className="space-y-3">
-            {[
-              { label: t("scenarioRoas20"), impact: results.ebitda * 0.2 },
-              { label: t("scenarioAds15"), impact: inputs.adSpend * 0.15 },
-              { label: t("scenarioRevenue30"), impact: results.ebitda * 0.3 },
-            ].map((scenario) => (
-              <div
-                key={scenario.label}
-                className="flex items-center justify-between p-3 bg-[var(--color-bg-alt)] border-[2px] border-[var(--color-ink)]"
-              >
-                <span className="font-heading font-semibold text-sm">{scenario.label}</span>
-                <span className="font-mono font-bold text-green-600">
-                  +€{scenario.impact.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Visual Breakdown */}
-        <div className="brutal-card p-6">
-          <h2 className="font-heading font-bold text-lg mb-4">{t("costStructure")}</h2>
-          <div className="space-y-3">
-            {[
-              { label: "COGS", value: inputs.cogs, color: "bg-[var(--color-red)]" },
-              { label: "Fulfillment", value: inputs.fulfillment, color: "bg-orange-400" },
-              { label: "Reclame", value: inputs.adSpend, color: "bg-blue-400" },
-              { label: "Fixe", value: inputs.fixedCosts, color: "bg-purple-400" },
-              { label: "Comision HUL", value: results.agencyFee, color: "bg-[var(--color-lime-dark)]" },
-              { label: "EBITDA", value: Math.max(0, results.ebitda), color: "bg-green-500" },
-            ].map((item) => {
-              const pct = inputs.revenue > 0 ? (item.value / inputs.revenue) * 100 : 0;
-              return (
-                <div key={item.label}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-heading font-semibold">{item.label}</span>
-                    <span className="font-mono">
-                      €{item.value.toLocaleString("ro-RO", { maximumFractionDigits: 0 })} ({pct.toFixed(1)}%)
-                    </span>
-                  </div>
-                  <div className="h-4 bg-[var(--color-bg-alt)] border-[2px] border-[var(--color-ink)]">
-                    <div
-                      className={`h-full ${item.color} transition-all duration-500`}
-                      style={{ width: `${Math.min(pct, 100)}%` }}
-                    />
-                  </div>
+                  <span className="mt-0.5 shrink-0">{rec.icon}</span>
+                  <p className="font-mono text-sm leading-relaxed">{rec.text}</p>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          {/* Action Items */}
+          <div className="brutal-card p-6">
+            <h2 className="font-heading font-bold text-lg mb-4 flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              {t("actionItemsTitle")}
+            </h2>
+            <div className="space-y-2">
+              {actionItems.map((item) => {
+                const checked = checkedActions.has(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleAction(item.id)}
+                    className={`w-full text-left p-3 border-[3px] border-[var(--color-ink)] flex items-center gap-3 transition-all ${
+                      checked ? "bg-[var(--color-lime)] opacity-70" : "bg-[var(--color-card)] hover:bg-[var(--color-bg-alt)]"
+                    }`}
+                  >
+                    <span
+                      className={`w-5 h-5 border-[3px] border-[var(--color-ink)] flex items-center justify-center transition-colors ${
+                        checked ? "bg-[var(--color-ink)]" : "bg-white"
+                      }`}
+                    >
+                      {checked && <Check className="w-3 h-3 text-[var(--color-lime)]" />}
+                    </span>
+                    <span className={`font-mono text-sm flex-1 ${checked ? "line-through text-[var(--color-muted)]" : ""}`}>
+                      {item.label}
+                    </span>
+                    <span
+                      className={`sticker text-[10px] ${
+                        item.impact === "high"
+                          ? "bg-[var(--color-red)] text-white"
+                          : item.impact === "medium"
+                          ? "bg-[var(--color-lime)]"
+                          : "bg-[var(--color-bg-alt)]"
+                      }`}
+                    >
+                      {item.impact === "high" ? "HIGH" : item.impact === "medium" ? "MED" : "LOW"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Benchmarks */}
+          <div className="brutal-card p-6">
+            <h2 className="font-heading font-bold text-lg mb-4">{t("benchmarksTitle")}</h2>
+            <BenchmarkChart
+              netMargin={results.netMargin}
+              adSpendRatio={inputs.revenue > 0 ? inputs.adSpend / inputs.revenue : 0}
+              roas={reportedRoas}
+            />
+            <p className="font-mono text-xs text-[var(--color-muted)] mt-3">
+              {t("benchmarksLegend")}
+            </p>
+          </div>
+
+          {/* Scenarios */}
+          <div className="brutal-card p-6">
+            <h2 className="font-heading font-bold text-lg mb-4">{t("scenarioTitle")}</h2>
+            <div className="space-y-3">
+              {[
+                { label: t("scenarioRoas20"), impact: results.ebitda * 0.2 },
+                { label: t("scenarioAds15"), impact: inputs.adSpend * 0.15 },
+                { label: t("scenarioRevenue30"), impact: results.ebitda * 0.3 },
+              ].map((scenario) => (
+                <div
+                  key={scenario.label}
+                  className="flex items-center justify-between p-3 bg-[var(--color-bg-alt)] border-[2px] border-[var(--color-ink)]"
+                >
+                  <span className="font-heading font-semibold text-sm">{scenario.label}</span>
+                  <span className="font-mono font-bold text-green-600">
+                    +€{scenario.impact.toLocaleString("ro-RO", { maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Visual Breakdown */}
+          <div className="brutal-card p-6">
+            <h2 className="font-heading font-bold text-lg mb-4">{t("costStructure")}</h2>
+            <div className="space-y-3">
+              {[
+                { label: "COGS", value: inputs.cogs, color: "bg-[var(--color-red)]" },
+                { label: "Fulfillment", value: inputs.fulfillment, color: "bg-orange-400" },
+                { label: "Reclame", value: inputs.adSpend, color: "bg-blue-400" },
+                { label: "Fixe", value: inputs.fixedCosts, color: "bg-purple-400" },
+                { label: "Comision HUL", value: results.agencyFee, color: "bg-[var(--color-lime-dark)]" },
+                { label: "EBITDA", value: Math.max(0, results.ebitda), color: "bg-green-500" },
+              ].map((item) => {
+                const pct = inputs.revenue > 0 ? (item.value / inputs.revenue) * 100 : 0;
+                return (
+                  <div key={item.label}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="font-heading font-semibold">{item.label}</span>
+                      <span className="font-mono">
+                        €{item.value.toLocaleString("ro-RO", { maximumFractionDigits: 0 })} ({pct.toFixed(1)}%)
+                      </span>
+                    </div>
+                    <div className="h-4 bg-[var(--color-bg-alt)] border-[2px] border-[var(--color-ink)]">
+                      <div
+                        className={`h-full ${item.color} transition-all duration-500`}
+                        style={{ width: `${Math.min(pct, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Scenario Comparison */}
+          <div className="brutal-card p-6">
+            <h2 className="font-heading font-bold text-lg mb-4 flex items-center gap-2">
+              <Calculator className="w-5 h-5" />
+              Comparare Scenarii
+            </h2>
+            <ScenarioComparison
+              scenarios={scenarios}
+              currentInputs={inputs}
+              currentResults={results}
+              onSave={handleSaveScenario}
+              onDelete={handleDeleteScenario}
+              onLoad={handleLoadScenario}
+              onCompare={handleCompareScenario}
+              compareScenarios={compareScenarios}
+            />
+          </div>
+        </div>
+
+        {/* AI Sidebar */}
+        <div className="space-y-6">
+          <div className="sticky top-8">
+            <AIAnalysisPanel
+              data={aiData}
+              loading={aiLoading}
+              error={aiError}
+              onAnalyze={handleAnalyze}
+              hasData={hasData}
+            />
           </div>
         </div>
       </div>
@@ -547,93 +719,140 @@ export function MarginCalculator({ reportedRoas = 0 }: MarginCalculatorProps) {
   }
 
   return (
-    <div className="max-w-xl">
-      <h1 className="font-display text-3xl mb-2">{t("title")}</h1>
-      <p className="font-mono text-sm text-[var(--color-muted)] mb-8">
-        {t("description")}
-      </p>
-
-      {/* Progress bar */}
-      <div className="h-3 bg-[var(--color-bg-alt)] border-[3px] border-[var(--color-ink)] mb-8">
-        <div
-          className="h-full bg-[var(--color-lime)] transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* Step card */}
-      <div className="brutal-card p-8">
-        <p className="text-xs font-mono uppercase text-[var(--color-muted)] mb-2">
-          {t("stepCounter", { current: step + 1, total: STEPS.length })}
+    <div className="grid lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-2 max-w-xl">
+        <h1 className="font-display text-3xl mb-2">{t("title")}</h1>
+        <p className="font-mono text-sm text-[var(--color-muted)] mb-8">
+          {t("description")}
         </p>
-        <h2 className="font-heading font-bold text-xl mb-6">{currentStep.label}</h2>
 
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[var(--color-muted)]">
-            {currentStep.unit === "%" ? "" : currentStep.unit}
-          </span>
-          <input
-            type="text"
-            inputMode="decimal"
-            value={inputs[currentStep.key as keyof CalculatorInputs]}
-            onChange={(e) => updateValue(currentStep.key as keyof CalculatorInputs, e.target.value)}
-            placeholder={currentStep.placeholder}
-            className="w-full px-4 py-4 bg-[var(--color-bg)] border-[3px] border-[var(--color-ink)] font-mono text-2xl font-bold focus:outline-none focus:shadow-[3px_3px_0_0_#0A0A0A]"
-            autoFocus
+        {/* Progress bar */}
+        <div className="h-3 bg-[var(--color-bg-alt)] border-[3px] border-[var(--color-ink)] mb-8">
+          <div
+            className="h-full bg-[var(--color-lime)] transition-all duration-300"
+            style={{ width: `${progress}%` }}
           />
-          {currentStep.unit === "%" && (
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[var(--color-muted)]">%</span>
-          )}
         </div>
 
-        <div className="flex gap-3 mt-8">
-          {step > 0 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="btn-brutal-ghost hover:bg-[var(--color-ink)] hover:text-[var(--color-lime)] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t("back")}
-            </button>
-          )}
-          {step < STEPS.length - 1 ? (
-            <button
-              onClick={() => setStep(step + 1)}
-              className="btn-brutal ml-auto"
-            >
-              {t("continue")}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowResults(true)}
-              className="btn-brutal ml-auto"
-            >
-              {t("calculate")}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
+        {/* Step card */}
+        <div className="brutal-card p-8">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-mono uppercase text-[var(--color-muted)]">
+              {t("stepCounter", { current: step + 1, total: STEPS.length })}
+            </p>
+            <InputTooltip fieldKey={currentStep.key} />
+          </div>
 
-      {/* Summary preview */}
-      {step > 0 && (
-        <div className="mt-6 brutal-card p-5">
-          <p className="text-xs font-mono uppercase text-[var(--color-muted)] mb-3">{t("quickSummary")}</p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {STEPS.slice(0, step + 1).map((s) => (
-              <div key={s.key} className="flex justify-between">
-                <span className="font-heading font-semibold text-[var(--color-muted)]">{s.label}</span>
-                <span className="font-mono">
-                  {s.unit === "%" ? "" : s.unit}
-                  {inputs[s.key as keyof CalculatorInputs].toLocaleString("ro-RO")}
-                  {s.unit === "%" ? "%" : ""}
-                </span>
-              </div>
-            ))}
+          <h2 className="font-heading font-bold text-xl mb-6">{currentStep.label}</h2>
+
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-[var(--color-muted)]">
+              {currentStep.unit === "%" ? "" : currentStep.unit}
+            </span>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={inputs[currentStep.key as keyof CalculatorInputs]}
+              onChange={(e) => updateValue(currentStep.key as keyof CalculatorInputs, e.target.value)}
+              placeholder={currentStep.placeholder}
+              className="w-full px-4 py-4 bg-[var(--color-bg)] border-[3px] border-[var(--color-ink)] font-mono text-2xl font-bold focus:outline-none focus:shadow-[3px_3px_0_0_#0A0A0A]"
+              autoFocus
+            />
+            {currentStep.unit === "%" && (
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-[var(--color-muted)]">%</span>
+            )}
+          </div>
+
+          {/* Smart validation warning */}
+          {validationWarning && (
+            <div className="mt-3 p-3 bg-yellow-50 border-[2px] border-[#FACC15] flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-[#FACC15] shrink-0 mt-0.5" />
+              <p className="font-mono text-xs">{validationWarning}</p>
+            </div>
+          )}
+
+          <div className="flex gap-3 mt-8">
+            {step > 0 && (
+              <button
+                onClick={() => setStep(step - 1)}
+                className="btn-brutal-ghost hover:bg-[var(--color-ink)] hover:text-[var(--color-lime)] transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                {t("back")}
+              </button>
+            )}
+            {step < STEPS.length - 1 ? (
+              <button
+                onClick={() => setStep(step + 1)}
+                className="btn-brutal ml-auto"
+              >
+                {t("continue")}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowResults(true)}
+                className="btn-brutal ml-auto"
+              >
+                {t("calculate")}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Summary preview */}
+        {step > 0 && (
+          <div className="mt-6 brutal-card p-5">
+            <p className="text-xs font-mono uppercase text-[var(--color-muted)] mb-3">{t("quickSummary")}</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {STEPS.slice(0, step + 1).map((s) => (
+                <div key={s.key} className="flex justify-between">
+                  <span className="font-heading font-semibold text-[var(--color-muted)]">{s.label}</span>
+                  <span className="font-mono">
+                    {s.unit === "%" ? "" : s.unit}
+                    {inputs[s.key as keyof CalculatorInputs].toLocaleString("ro-RO")}
+                    {s.unit === "%" ? "%" : ""}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* AI Sidebar - shown on input screen too */}
+      <div className="space-y-6">
+        <div className="sticky top-8">
+          <div className="brutal-card p-8 text-center space-y-4">
+            <div className="w-16 h-16 border-[3px] border-[var(--color-ink)] bg-[var(--color-bg-alt)] flex items-center justify-center mx-auto">
+              <Sparkles className="w-8 h-8 text-[var(--color-muted)]" />
+            </div>
+            <h3 className="font-heading font-bold text-lg">AI Financial Advisor</h3>
+            <p className="font-mono text-sm text-[var(--color-muted)]">
+              Completează toate câmpurile și apasă "Calculează" pentru a primi o analiză completă cu AI.
+            </p>
+            <div className="space-y-2 text-left">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[var(--color-lime)]" />
+                <span className="font-mono text-xs">Scor profitabilitate 0-100</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[var(--color-lime)]" />
+                <span className="font-mono text-xs">Analiză break-even</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[var(--color-lime)]" />
+                <span className="font-mono text-xs">Recomandări acționabile</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[var(--color-lime)]" />
+                <span className="font-mono text-xs">Identificare riscuri</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
