@@ -84,3 +84,46 @@ export interface Report {
   status: string;
   created_at?: string;
 }
+
+export interface CampaignSnapshot {
+  id: string;
+  client_id: string;
+  date: string;
+  campaign_id: string;
+  campaign_name: string;
+  spend: number;
+  revenue: number;
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  roas: number;
+  ctr: number;
+  cpc: number;
+  status: string;
+  created_at?: string;
+}
+
+export interface AlertRule {
+  id: string;
+  client_id: string;
+  metric: "ROAS" | "Spend" | "CTR" | "Conversions";
+  operator: "<" | ">";
+  threshold: number;
+  is_active: boolean;
+  is_triggered: boolean;
+  acknowledged: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DailyMetrics {
+  date: string;
+  spend: number;
+  revenue: number;
+  impressions: number;
+  clicks: number;
+  roas: number;
+  ctr: number;
+  cpc: number;
+  conversions: number;
+}
