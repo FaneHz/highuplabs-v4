@@ -77,10 +77,11 @@ export async function POST(request: NextRequest) {
     const data = result.data;
 
     // 1. Salvează în Supabase (dacă e configurat)
+    let dbSaved = false;
     try {
       const supabase = getSupabase();
       if (supabase) {
-        await supabase.from("applications").insert({
+        const { error: dbError } = await supabase.from("applications").insert({
           name: data.name,
           email: data.email,
           phone: data.phone || null,
@@ -92,8 +93,17 @@ export async function POST(request: NextRequest) {
           source: "website",
           status: "new",
         });
+        
+        if (dbError) {
+          console.error("Supabase insert error:", dbError);
+          return NextResponse.json(
+            { error: "Eroare la salvarea datelor: " + dbError.message },
+            { status: 500 }
+          );
+        }
+        dbSaved = true;
       }
-    } catch (dbError) {
+    } catch (dbError: any) {
       console.error("Supabase save failed:", dbError);
       return NextResponse.json(
         { error: "Eroare la salvarea datelor. Încearcă mai târziu." },
@@ -101,7 +111,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Trimite email via Resend
+    // 2. Trimite email via Resend (nu blocăm submit-ul dacă emailul eșuează)
     try {
       const resend = getResend();
       if (resend) {
@@ -123,10 +133,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (emailError) {
       console.error("Email sending failed:", emailError);
-      return NextResponse.json(
-        { error: "Aplicația a fost salvată, dar emailul de confirmare nu a putut fi trimis." },
-        { status: 500 }
-      );
+      // Nu returnăm 500 - aplicația a fost salvată în DB
     }
 
     console.log("Application received:", {
