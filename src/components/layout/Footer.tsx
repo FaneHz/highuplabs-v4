@@ -116,7 +116,7 @@ export default function Footer({ locale }: { locale: Locale }) {
 
         <div className="py-6 border-t border-[#1A1A1A] flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[10px] font-mono text-[#A3A3A3] uppercase tracking-wider">
-            © {new Date().getFullYear()} HIGH-UP.LABS — {t("rights")}
+            © <span suppressHydrationWarning>{new Date().getFullYear()}</span> HIGH-UP.LABS — {t("rights")}
           </p>
           <p className="text-[10px] font-mono text-[#333333]">
             BUILT WITH PRECISION IN PITESTI

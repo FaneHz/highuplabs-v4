@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, useMemo, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import Link from "next/link";
@@ -11,7 +11,9 @@ function Particles() {
   const mouseRef = useRef({ x: 0, y: 0 });
 
   const count = 2000;
-  const positions = useMemo(() => {
+  const [positions, setPositions] = useState<Float32Array | null>(null);
+
+  useEffect(() => {
     const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
@@ -21,7 +23,7 @@ function Particles() {
       pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       pos[i * 3 + 2] = r * Math.cos(phi);
     }
-    return pos;
+    setPositions(pos);
   }, []);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ function Particles() {
   }, []);
 
   useFrame((state) => {
-    if (!meshRef.current) return;
+    if (!meshRef.current || !positions) return;
     meshRef.current.rotation.y += 0.0003;
     meshRef.current.rotation.x += 0.0001;
     const posArray = meshRef.current.geometry.attributes.position
@@ -56,19 +58,23 @@ function Particles() {
 
   return (
     <points ref={meshRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.022}
-        color="#CCFF00"
-        transparent
-        opacity={0.5}
-        sizeAttenuation
-      />
+      {positions && (
+        <>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              args={[positions, 3]}
+            />
+          </bufferGeometry>
+          <pointsMaterial
+            size={0.022}
+            color="#CCFF00"
+            transparent
+            opacity={0.5}
+            sizeAttenuation
+          />
+        </>
+      )}
     </points>
   );
 }
