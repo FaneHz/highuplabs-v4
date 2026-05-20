@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -24,7 +24,7 @@ import {
   AlertTriangle,
   Info
 } from "lucide-react";
-import { supabaseClient } from "@/lib/supabase-client";
+import { createClient } from "@/lib/supabase-client";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -254,6 +254,13 @@ export default function OfferCalculator() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const supabase = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return createClient();
+    }
+    return null;
+  }, []);
+
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -297,8 +304,9 @@ export default function OfferCalculator() {
     setError("");
     
     try {
+      if (!supabase) throw new Error("Client Supabase indisponibil");
       // 1. Salvează mai întâi în Supabase
-      const { error: dbError } = await supabaseClient
+      const { error: dbError } = await supabase
         .from("offers")
         .insert({
           email: inputs.email,
@@ -361,7 +369,8 @@ export default function OfferCalculator() {
     setLoading(true);
     
     try {
-      await supabaseClient
+      if (!supabase) throw new Error("Client Supabase indisponibil");
+      await supabase
         .from("offers")
         .insert({
           email: inputs.email,
@@ -427,10 +436,11 @@ export default function OfferCalculator() {
     setError("");
     
     try {
+      if (!supabase) throw new Error("Client Supabase indisponibil");
       const formData = new FormData(e.target as HTMLFormElement);
       
       // 1. Salvează mai întâi în Supabase
-      const { error: dbError } = await supabaseClient
+      const { error: dbError } = await supabase
         .from("offers")
         .insert({
           email: inputs.email,
