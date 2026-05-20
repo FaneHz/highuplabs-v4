@@ -11,7 +11,7 @@ const schema = z.object({
   name: z.string().min(2, "Minim 2 caractere"),
   email: z.string().email("Email invalid"),
   phone: z.string().min(6, "Minim 6 cifre").optional().or(z.literal("")),
-  website: z.string().url("URL invalid").optional().or(z.literal("")),
+  website: z.string().optional().or(z.literal("")),
   sales: z.string().min(1, "Obligatoriu"),
   budget: z.string().min(1, "Obligatoriu"),
   message: z.string().max(2000).optional(),

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -149,6 +151,8 @@ function GaugeBar({ value, max, label, color = "#CCFF00" }: {
 
 export default function CalculatorSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const params = useParams();
+  const locale = (params?.locale as string) || "ro";
   const [sales, setSales] = useState(15000);
   const [budget, setBudget] = useState(2000);
   const [margin, setMargin] = useState(30);
@@ -231,7 +235,7 @@ export default function CalculatorSection() {
                 <div className="flex justify-between items-end mb-2">
                   <span className="text-sm font-bold text-white">Profit net estimat</span>
                   <span className={`text-4xl font-black ${net >= 0 ? "text-[#CCFF00]" : "text-[#FF3333]"}`}>
-                    <AnimatedNumber value={Math.max(0, net)} suffix=" EUR" />
+                    <AnimatedNumber value={net} suffix=" EUR" />
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -250,6 +254,13 @@ export default function CalculatorSection() {
                 </p>
               </div>
             )}
+
+            <Link
+              href={`/${locale}/oferta?sales=${sales}&margin=${margin}&budget=${budget}`}
+              className="mt-8 w-full py-4 bg-[#CCFF00] text-black font-mono font-bold uppercase tracking-wider text-sm border-2 border-[#CCFF00] hover:bg-transparent hover:text-[#CCFF00] transition-all flex items-center justify-center gap-2"
+            >
+              Generează Oferta Completă →
+            </Link>
 
             <p className="mt-8 text-[10px] font-mono text-[#808080] leading-relaxed">
               Calculul e simplificat. Nu include costuri fixe, salarii, impozit pe profit sau retururi.

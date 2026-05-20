@@ -31,7 +31,7 @@ export default function ArticleRenderer({ blocks }: { blocks: ArticleBlock[] }) 
                 {block.items?.map((item, j) => (
                   <li key={j} className="flex gap-3 text-[#D4D4D8]">
                     <span className="text-[#CCFF00] font-mono text-sm flex-shrink-0 mt-1">-</span>
-                    <span dangerouslySetInnerHTML={{ __html: item }} className="leading-[1.7]" />
+                    <span className="leading-[1.7]">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -44,7 +44,7 @@ export default function ArticleRenderer({ blocks }: { blocks: ArticleBlock[] }) 
                     <span className="text-[#CCFF00] font-mono text-sm font-bold flex-shrink-0">
                       {String(j + 1).padStart(2, "0")}
                     </span>
-                    <span dangerouslySetInnerHTML={{ __html: item }} className="leading-[1.7]" />
+                    <span className="leading-[1.7]">{item}</span>
                   </li>
                 ))}
               </ol>

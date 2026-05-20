@@ -9,6 +9,7 @@ const navLinks = [
   { key: "articles", href: "/articole" },
   { key: "caseStudies", href: "/studii-de-caz" },
   { key: "about", href: "/despre" },
+  { key: "offer", href: "/oferta", highlight: true },
 ];
 
 export default function Navigation({ locale }: { locale: Locale }) {
@@ -59,7 +60,11 @@ export default function Navigation({ locale }: { locale: Locale }) {
               <Link
                 key={link.key}
                 href={`/${locale}${link.href}`}
-                className="px-6 py-5 text-xs font-mono uppercase tracking-wider text-[#A3A3A3] hover:text-white border-l border-[#1A1A1A] transition-colors"
+                className={`px-6 py-5 text-xs font-mono uppercase tracking-wider border-l border-[#1A1A1A] transition-colors ${
+                  link.highlight
+                    ? "text-[#CCFF00] hover:text-[#CCFF00]"
+                    : "text-[#A3A3A3] hover:text-white"
+                }`}
               >
                 {t(link.key)}
               </Link>
@@ -71,7 +76,7 @@ export default function Navigation({ locale }: { locale: Locale }) {
               {t("apply")}
             </Link>
             <Link
-              href="/dashboard/login"
+              href="/login"
               className="ml-4 px-3 py-2 text-[10px] font-mono text-[#A3A3A3] hover:text-[#CCFF00] border border-[#1A1A1A] transition-colors uppercase"
             >
               Client

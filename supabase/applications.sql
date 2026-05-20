@@ -28,4 +28,4 @@ CREATE POLICY "Allow all insert" ON applications
   FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Allow admin select" ON applications
-  FOR SELECT USING (auth.role() = 'authenticated');
+  FOR SELECT USING (auth.uid() IN (SELECT id FROM clients WHERE role = 'admin'));

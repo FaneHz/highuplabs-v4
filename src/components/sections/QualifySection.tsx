@@ -50,7 +50,7 @@ function CircularProgress({ score, max }: { score: number; max: number }) {
   const strokeDashoffset = circumference - progress * circumference;
 
   return (
-    <div className="relative w-40 h-40 mx-auto">
+    <div className="relative w-40 h-40 mx-auto flex items-center justify-center">
       <svg
         height={radius * 2}
         width={radius * 2}

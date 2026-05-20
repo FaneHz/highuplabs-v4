@@ -5,7 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey || apiKey.includes('xxx') || apiKey.includes('placeholder')) {
+    console.error("RESEND_API_KEY nu este configurat corect");
+    return null;
+  }
   return new Resend(apiKey);
 }
 
@@ -19,8 +22,8 @@ function getSupabase() {
 const applicationSchema = z.object({
   name: z.string().min(2, "Numele trebuie să aibă minim 2 caractere").max(100),
   email: z.string().email("Adresa de email nu este validă"),
-  phone: z.string().min(6).max(20).optional(),
-  website: z.string().url("Website-ul nu este valid").optional().or(z.literal("")),
+  phone: z.string().min(6).max(20).optional().or(z.literal("")),
+  website: z.string().optional().or(z.literal("")),
   sales: z.string().min(1, "Completează vânzările lunare"),
   budget: z.string().min(1, "Completează bugetul de reclame"),
   message: z.string().max(2000).optional(),
@@ -92,7 +95,10 @@ export async function POST(request: NextRequest) {
       }
     } catch (dbError) {
       console.error("Supabase save failed:", dbError);
-      // Nu returnăm eroare — continuăm cu email
+      return NextResponse.json(
+        { error: "Eroare la salvarea datelor. Încearcă mai târziu." },
+        { status: 500 }
+      );
     }
 
     // 2. Trimite email via Resend
@@ -117,6 +123,10 @@ export async function POST(request: NextRequest) {
       }
     } catch (emailError) {
       console.error("Email sending failed:", emailError);
+      return NextResponse.json(
+        { error: "Aplicația a fost salvată, dar emailul de confirmare nu a putut fi trimis." },
+        { status: 500 }
+      );
     }
 
     console.log("Application received:", {
