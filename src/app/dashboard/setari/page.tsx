@@ -13,6 +13,7 @@ export default async function SettingsRoute() {
     .eq("id", user.id)
     .maybeSingle();
 
+  // Daca nu exista inregistrare in clients, redirect la onboarding
   if (!client) {
     redirect("/dashboard/onboarding");
   }

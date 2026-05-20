@@ -10,6 +10,44 @@ async function getActiveMetaAccount() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
 
+  // 1. Incarca intai assignments (model simplificat)
+  const { data: assignments } = await supabase
+    .from("client_ad_assignments")
+    .select("ad_account_id, master_account_id")
+    .eq("client_id", user.id)
+    .eq("platform", "meta")
+    .eq("is_active", true)
+    .limit(1);
+
+  if (assignments && assignments.length > 0) {
+    // Model simplificat: foloseste token-ul master (admin)
+    const assignment = assignments[0];
+    const { data: masterAccount } = await supabase
+      .from("master_platform_accounts")
+      .select("access_token_encrypted, token_expires_at")
+      .eq("account_id", assignment.master_account_id)
+      .eq("platform", "meta")
+      .eq("is_active", true)
+      .single();
+
+    if (!masterAccount) {
+      throw new Error("Contul Meta principal nu este configurat. Contacteaza echipa High-Up Labs.");
+    }
+
+    const accessToken = await refreshMasterMetaTokenIfNeeded(
+      supabase,
+      assignment.master_account_id,
+      decryptToken(masterAccount.access_token_encrypted),
+      masterAccount.token_expires_at
+    );
+
+    return {
+      accessToken,
+      accountId: assignment.ad_account_id,
+    };
+  }
+
+  // 2. Fallback la modelul legacy (client_platform_accounts)
   const { data: accounts, error } = await supabase
     .from("client_platform_accounts")
     .select("account_id, access_token_encrypted, token_expires_at")
@@ -36,6 +74,35 @@ async function getActiveMetaAccount() {
     accessToken,
     accountId: account.account_id,
   };
+}
+
+async function refreshMasterMetaTokenIfNeeded(
+  supabase: SupabaseClient,
+  masterAccountId: string,
+  currentToken: string,
+  expiresAt: string | null
+): Promise<string> {
+  if (!expiresAt) return currentToken;
+
+  const expiryDate = new Date(expiresAt);
+  const now = new Date();
+  const hoursUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+  if (hoursUntilExpiry > 24) return currentToken;
+
+  const { token, expiresIn } = await getMetaLongLivedToken(currentToken);
+  const newExpiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
+
+  await supabase
+    .from("master_platform_accounts")
+    .update({
+      access_token_encrypted: encryptToken(token),
+      token_expires_at: newExpiresAt,
+    })
+    .eq("account_id", masterAccountId)
+    .eq("platform", "meta");
+
+  return token;
 }
 
 export async function refreshMetaTokenIfNeeded(
